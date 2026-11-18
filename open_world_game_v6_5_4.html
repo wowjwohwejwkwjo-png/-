@@ -1,0 +1,3082 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<title>عالم مفتوح - بنك الراجحي والشرطة (v6.5.4)</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233ea6ff'/%3E%3Ctext x='50' y='65' font-size='55' text-anchor='middle'%3E%F0%9F%8F%99%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%233ea6ff'/%3E%3Ctext x='90' y='120' font-size='100' text-anchor='middle'%3E%F0%9F%8F%99%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="عالم مفتوح">
+<meta name="theme-color" content="#3ea6ff">
+<style>
+  :root{ --bg:#87ceeb; --panel:#111a; --text:#fff; color-scheme: dark; }
+  html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);
+    font-family:Tahoma,sans-serif;color:var(--text);
+    box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+  canvas{display:block;touch-action:none;}
+  #hud{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;z-index:5;
+    padding:10px 14px;background:linear-gradient(to bottom,#000a,transparent);
+    font-size:13px;text-align:center;}
+  #joy{position:fixed;bottom:calc(30px + env(safe-area-inset-bottom,0px));left:30px;
+    width:110px;height:110px;border-radius:50%;background:#ffffff22;
+    border:2px solid #ffffff55;z-index:6;touch-action:none;}
+  #joyStick{position:absolute;width:48px;height:48px;border-radius:50%;
+    background:#ffcc33;top:31px;left:31px;}
+  #jumpBtn{position:fixed;bottom:calc(40px + env(safe-area-inset-bottom,0px));right:30px;
+    width:80px;height:80px;border-radius:50%;background:#ff4d4d;color:#fff;
+    font-weight:bold;border:none;z-index:6;font-size:13px;}
+  #carBtn{position:fixed;bottom:calc(130px + env(safe-area-inset-bottom,0px));right:30px;
+    width:80px;height:50px;border-radius:12px;background:#3ea6ff;color:#fff;
+    font-weight:bold;border:none;z-index:6;font-size:13px;}
+  #shopBtn{position:fixed;top:calc(40px + env(safe-area-inset-top,0px));left:14px;
+    padding:8px 14px;border-radius:10px;background:#ffcc33;color:#1a2236;
+    font-weight:bold;border:none;z-index:6;font-size:13px;}
+  #coins{position:fixed;top:calc(40px + env(safe-area-inset-top,0px));right:14px;
+    padding:8px 14px;border-radius:10px;background:#000a;color:#ffcc33;
+    font-weight:bold;z-index:6;font-size:13px;}
+  #shopPanel{display:none;position:fixed;inset:0;z-index:20;background:#000c;
+    align-items:center;justify-content:center;}
+  #shopBox{background:#1a2236;border-radius:16px;padding:20px;max-width:320px;width:88%;
+    max-height:80vh;overflow-y:auto;}
+  #shopBox h3{margin:10px 0 6px;color:#ffcc33;font-size:15px;}
+  .shopItem{display:flex;justify-content:space-between;align-items:center;
+    background:#ffffff11;padding:8px 10px;border-radius:8px;margin-bottom:6px;font-size:13px;}
+  .shopItem button{background:#ffcc33;color:#1a2236;border:none;border-radius:6px;
+    padding:6px 10px;font-weight:bold;font-size:12px;}
+  .shopItem button.owned{background:#2ecc71;}
+  #closeShop{display:block;margin:12px auto 0;background:#ff4d4d;color:#fff;
+    border:none;border-radius:8px;padding:8px 20px;font-weight:bold;}
+  #wheelUI{display:none;position:fixed;bottom:calc(30px + env(safe-area-inset-bottom,0px));
+    left:50%;transform:translateX(-50%);width:70px;height:70px;border-radius:50%;
+    border:6px solid #333;background:#222;z-index:6;}
+  #wheelUI::before{content:'';position:absolute;top:8px;left:50%;width:4px;height:22px;
+    background:#ffcc33;transform:translateX(-50%);border-radius:2px;}
+  #reverseBtn{display:none;position:fixed;bottom:calc(130px + env(safe-area-inset-bottom,0px));left:30px;width:80px;height:50px;border-radius:12px;background:#6c63ff;color:#fff;font-weight:bold;border:none;z-index:6;font-size:13px;}
+  #exitCarBtn{display:none;position:fixed;bottom:calc(255px + env(safe-area-inset-bottom,0px));right:30px;width:80px;height:50px;border-radius:12px;background:#ff8800;color:#fff;font-weight:bold;border:none;z-index:8;font-size:12px;box-shadow:0 2px 8px #0006;}
+  #viewToggleBtn{display:none;position:fixed;bottom:calc(315px + env(safe-area-inset-bottom,0px));right:30px;width:80px;height:50px;border-radius:12px;background:#1a2236;color:#fff;font-weight:bold;border:2px solid #3ea6ff;z-index:8;font-size:11px;box-shadow:0 2px 8px #0006;}
+  #brakeBtn{display:none;position:fixed;bottom:calc(130px + env(safe-area-inset-bottom,0px));right:30px;
+    width:80px;height:50px;border-radius:12px;background:#ff4d4d;color:#fff;
+    font-weight:bold;border:none;z-index:6;font-size:13px;}
+  #homeActionBtn,#cityActionBtn{display:none;position:fixed;top:calc(205px + env(safe-area-inset-top,0px));left:14px;padding:9px 14px;border-radius:10px;color:#fff;font-weight:bold;border:none;z-index:7;font-size:13px;box-shadow:0 2px 8px #0006;}
+  #homeActionBtn{background:#168a55;} #cityActionBtn{background:#286fc4;}
+  #housingBtn{position:fixed;top:calc(160px + env(safe-area-inset-top,0px));left:14px;padding:8px 14px;border-radius:10px;background:#4da6ff;color:#fff;font-weight:bold;border:none;z-index:6;font-size:13px;}
+  #housingPanel{display:none;position:fixed;inset:0;z-index:20;background:#000c;align-items:center;justify-content:center;}
+  #housingBox{background:#1a2236;border-radius:16px;padding:20px;max-width:340px;width:88%;max-height:82vh;overflow-y:auto;color:#fff;}
+  .houseCard{background:#ffffff11;border-radius:10px;padding:12px;margin:8px 0;}
+  .houseCard button{background:#2ecc71;color:#06240f;border:none;border-radius:7px;padding:7px 12px;font-weight:bold;margin-top:7px;cursor:pointer;}
+  #jobBtn{position:fixed;top:calc(80px + env(safe-area-inset-top,0px));left:14px;
+    padding:8px 14px;border-radius:10px;background:#2ecc71;color:#06240f;
+    font-weight:bold;border:none;z-index:6;font-size:13px;}
+  #jobStatus{display:none;position:fixed;top:calc(250px + env(safe-area-inset-top,0px));left:14px;
+    padding:6px 12px;border-radius:8px;background:#000a;color:#ffe066;font-size:12px;z-index:6;max-width:200px;}
+  .cityLabel{position:fixed;transform:translate(-50%,-100%);background:#000a;color:#fff;
+    padding:3px 8px;border-radius:6px;font-size:11px;font-weight:bold;z-index:4;white-space:nowrap;pointer-events:none;}
+  #codesBtn{position:fixed;top:calc(120px + env(safe-area-inset-top,0px));left:14px;
+    padding:8px 14px;border-radius:10px;background:#ff8800;color:#2a1400;
+    font-weight:bold;border:none;z-index:6;font-size:13px;}
+  #codesPanel{display:none;position:fixed;inset:0;z-index:20;background:#000c;
+    align-items:center;justify-content:center;}
+  #codesPanel input{width:100%;padding:10px;border-radius:8px;border:none;
+    font-size:15px;text-align:center;margin-bottom:10px;box-sizing:border-box;}
+  #codesPanel button.go{background:#2ecc71;color:#06240f;border:none;border-radius:8px;
+    padding:10px 20px;font-weight:bold;width:100%;margin-bottom:8px;}
+  #codeMsg{min-height:20px;font-size:13px;color:#ffe066;text-align:center;margin-bottom:8px;}
+  #sleepBtn{display:none;position:fixed;top:calc(240px + env(safe-area-inset-top,0px));left:14px;
+    padding:8px 14px;border-radius:10px;background:#6c63ff;color:#fff;
+    font-weight:bold;border:none;z-index:7;font-size:13px;}
+  #sleepOverlay{display:none;position:fixed;inset:0;z-index:30;background:#000;
+    align-items:center;justify-content:center;opacity:0;transition:opacity .6s;
+    color:#fff;font-size:28px;font-weight:bold;}
+
+  /* Bank interaction modal */
+  #bankModal{display:none;position:fixed;inset:0;z-index:25;background:#000c;align-items:center;justify-content:center;}
+  #bankBox{background:#1a2236;border:2px solid #2e7d32;border-radius:16px;padding:20px;max-width:340px;width:88%;color:#fff;text-align:center;}
+  #bankBox h3{color:#2ecc71;margin-top:0;}
+  .bankBtn{background:#2e7d32;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-weight:bold;margin:6px 0;width:100%;cursor:pointer;}
+  .bankBtn.danger{background:#c62828;}
+
+  /* Prison overlay */
+  #prisonOverlay{display:none;position:fixed;inset:0;z-index:40;background:#000e;align-items:center;justify-content:center;flex-direction:column;color:#ff4d4d;font-size:24px;font-weight:bold;}
+
+  html,body{touch-action:none;overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;}
+  input{-webkit-user-select:text;user-select:text;}
+  button{touch-action:manipulation;}
+  #joy{left:20px!important;}
+  #reverseBtn{left:20px!important;bottom:calc(156px + env(safe-area-inset-bottom,0px))!important;}
+  #jumpBtn{right:14px!important;bottom:calc(30px + env(safe-area-inset-bottom,0px))!important;width:74px!important;height:74px!important;}
+  #fireBtn{right:14px!important;bottom:calc(112px + env(safe-area-inset-bottom,0px))!important;width:74px!important;height:46px!important;}
+  #carBtn{right:14px!important;bottom:calc(166px + env(safe-area-inset-bottom,0px))!important;width:74px!important;height:46px!important;font-size:12px!important;}
+  #brakeBtn{right:96px!important;bottom:calc(30px + env(safe-area-inset-bottom,0px))!important;width:74px!important;height:46px!important;}
+  #exitCarBtn{right:96px!important;bottom:calc(84px + env(safe-area-inset-bottom,0px))!important;width:74px!important;height:46px!important;font-size:11px!important;}
+  #viewToggleBtn{right:96px!important;bottom:calc(138px + env(safe-area-inset-bottom,0px))!important;width:74px!important;height:46px!important;font-size:10px!important;}
+  #sirenBtn{display:none;position:fixed;right:96px;bottom:calc(192px + env(safe-area-inset-bottom,0px));width:74px;height:46px;border-radius:12px;background:#c62828;color:#fff;font-weight:bold;border:2px solid #1565c0;z-index:8;font-size:10px;box-shadow:0 2px 8px #0006;}
+  #flyControls{right:178px!important;bottom:calc(30px + env(safe-area-inset-bottom,0px))!important;}
+  #speedControls{right:178px!important;bottom:calc(184px + env(safe-area-inset-bottom,0px))!important;}
+  #flyControls button,#speedControls button{width:74px!important;}
+  @media (max-width:400px){#flyControls{bottom:calc(160px + env(safe-area-inset-bottom,0px))!important;}#speedControls{bottom:calc(312px + env(safe-area-inset-bottom,0px))!important;}}
+  #wheelUI{pointer-events:none!important;z-index:5!important;}
+  #jobStatus{left:auto!important;right:14px!important;top:calc(135px + env(safe-area-inset-top,0px))!important;max-width:160px!important;}
+
+  #phoneBtn{position:fixed;top:calc(85px + env(safe-area-inset-top,0px));right:14px;width:46px;height:40px;border-radius:10px;background:#111827;color:#fff;border:2px solid #3ea6ff;z-index:26;font-size:20px;}
+  #phone{display:none;position:fixed;right:10px;top:50%;transform:translateY(-50%);width:210px;height:min(360px,76vh);background:#0b0f1a;border:3px solid #374151;border-radius:26px;z-index:25;flex-direction:column;box-shadow:0 8px 30px #000b;padding:8px;box-sizing:border-box;color:#fff;font-size:12px;}
+  .ph-top{display:flex;justify-content:space-between;padding:2px 10px 6px;font-size:11px;color:#9ca3af;}
+  #phScreen{flex:1;overflow-y:auto;background:linear-gradient(160deg,#1e3a5f,#0f172a);border-radius:16px;padding:10px;}
+  #phScreen h4{margin:0 0 8px;font-size:13px;color:#ffe066;}
+  #phScreen p{margin:6px 0;line-height:1.5;}
+  .apps{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+  .apps button{background:#ffffff18;border:none;border-radius:14px;color:#fff;padding:10px 4px;font-size:26px;display:flex;flex-direction:column;align-items:center;gap:4px;}
+  .apps button span{font-size:10px;}
+  .ph-act{background:#2ecc71;color:#06240f;border:none;border-radius:8px;padding:8px 10px;font-weight:bold;width:100%;margin-top:4px;font-size:12px;}
+  .ph-card{background:#ffffff14;border-radius:10px;padding:8px;margin-bottom:8px;}
+  .ph-msg{color:#ffe066;}
+  .ph-bottom{display:flex;justify-content:space-around;padding-top:6px;}
+  .ph-bottom button{background:#1f2937;color:#fff;border:none;border-radius:50%;width:34px;height:34px;font-size:14px;}
+  #toast{display:none;position:fixed;top:calc(60px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:#000d;color:#fff;padding:8px 14px;border-radius:10px;z-index:40;font-size:13px;font-weight:bold;max-width:80vw;text-align:center;pointer-events:none;}
+</style>
+</head>
+<body>
+<div id="hud">تحرك: WASD / العصا &nbsp;|&nbsp; اسحب الشاشة لتدوير الكاميرا &nbsp;|&nbsp; قفز: مسافة &nbsp;|&nbsp; ركوب سيارة: E &nbsp;|&nbsp; بنك الراجحي: تقارب منه</div>
+<div id="joy"><div id="joyStick"></div></div>
+<button id="jumpBtn">⬆️ قفز</button>
+<button id="carBtn">🚗 ركوب</button>
+<button id="brakeBtn">🛑 فرامل</button>
+<button id="reverseBtn">↩️ رجوع</button>
+<button id="exitCarBtn">🚶 نزول من السيارة</button>
+<button id="viewToggleBtn">📷 المنظور الأول</button>
+<div id="wheelUI"></div>
+
+<div id="flyControls" style="display:none;position:fixed;bottom:calc(255px + env(safe-area-inset-bottom,0px));right:30px;z-index:7;flex-direction:column;gap:8px;">
+  <button id="flyUpBtn" style="width:80px;height:44px;border-radius:12px;background:#00d2d3;color:#052c2d;font-weight:bold;border:none;font-size:13px;box-shadow:0 2px 8px #0006;">⬆️ ارتفاع</button>
+  <button id="flyDownBtn" style="width:80px;height:44px;border-radius:12px;background:#54a0ff;color:#061f42;font-weight:bold;border:none;font-size:13px;box-shadow:0 2px 8px #0006;">⬇️ هبوط</button>
+  <button id="toggleFlyBtn" style="width:80px;height:40px;border-radius:12px;background:#ff9f43;color:#2b1600;font-weight:bold;border:none;font-size:12px;box-shadow:0 2px 8px #0006;">🪽 طيران</button>
+</div>
+
+<div id="speedControls" style="display:none;position:fixed;bottom:calc(360px + env(safe-area-inset-bottom,0px));right:30px;z-index:7;flex-direction:column;gap:8px;">
+  <button id="toggleSpeedBtn" style="width:80px;height:40px;border-radius:12px;background:#e74c3c;color:#fff;font-weight:bold;border:none;font-size:11px;box-shadow:0 2px 8px #0006;">⚡ سرعة خارقة</button>
+</div>
+
+<button id="fireBtn" style="position:fixed;bottom:calc(195px + env(safe-area-inset-bottom,0px));right:30px;width:80px;height:50px;border-radius:12px;background:#333;color:#fff;font-weight:bold;border:none;z-index:6;font-size:13px;">🔫 إطلاق</button>
+<button id="shopBtn">🛍️ المتجر</button>
+<div id="coins">💰 <span id="coinsVal">500</span> | 🏦 في البنك: <span id="bankVal">0</span></div>
+<button id="jobBtn">💼 الوظائف</button>
+<button id="housingBtn">🏠 السكن</button>
+<button id="homeActionBtn">🏠 الذهاب إلى منزلي</button>
+<button id="cityActionBtn">🌆 الخروج إلى المدينة</button>
+<button id="sleepBtn">🛏️ نوم</button>
+<div id="sleepOverlay">💤 ...Zzz</div>
+<button id="codesBtn">🎟️ أكواد</button>
+<div id="jobStatus"></div>
+
+<!-- Bank Modal -->
+<div id="bankModal"><div id="bankBox">
+  <h3>🏦 بنك الراجحي</h3>
+  <p id="bankDialogText">مرحباً بك في بنك الراجحي. كيف يمكنني مساعدتك اليوم؟</p>
+  <button class="bankBtn" id="askAiBtn">🤖 سؤال الموظف (ذكاء اصطناعي)</button>
+  <button class="bankBtn" id="atmDepositBtn">📥 إيداع الأموال في الصراف الآلي</button>
+  <button class="bankBtn" id="atmWithdrawBtn">📤 سحب الأموال من الصراف الآلي</button>
+  <button class="bankBtn danger" id="robBankBtn">🚨 تهديد الموظف وسرقة الخزنة (20,000 ريال)</button>
+  <button class="bankBtn" style="background:#555;" id="closeBankBtn">إغلاق</button>
+</div></div>
+
+<!-- Prison Overlay -->
+<div id="prisonOverlay">
+  <div>👮 القبض عليك بواسطة الشرطة!</div>
+  <div style="font-size:16px; margin:10px 0;">تم إيداعك في السجن</div>
+  <div id="prisonTimer" style="font-size:36px; color:#ffe066;">60</div>
+  <div style="font-size:14px; margin-top:10px;">ثانية حتى الإفراج</div>
+</div>
+
+<div id="housingPanel"><div id="housingBox">
+  <h3>🏠 السكن والعقارات</h3>
+  <div class="houseCard"><b>🏢 شقة صغيرة</b><br><small>شراء مرة واحدة: 50 ريال — شقة اقتصادية خاصة بك مدى الحياة (مكان آمن للهروب من الشرطة).</small><br><button id="buySmallAptBtn">شراء الشقة الصغيرة (50 ريال)</button></div>
+  <div class="houseCard"><b>🏙️ شقة برج خليفة</b><br><small>شراء مرة واحدة: 50,000 ريال — شقة فاخرة في أعلى برج خليفة مدى الحياة.</small><br><button id="buyBurjAptBtn">شراء شقة برج خليفة (50,000 ريال)</button></div>
+  <div class="houseCard"><b>🏰 بيت فخم (قصر)</b><br><small>شراء مرة واحدة: 18,000 ريال — قصر ملكك مدى الحياة مع حديقة زهور وحراس وبوتات تتمشى حوله.</small><br><button id="buyHouseBtn">شراء القصر (18,000 ريال)</button></div>
+  <div id="housingMsg" style="text-align:center;color:#ffe066;min-height:22px;margin-top:6px;"></div>
+  <button id="closeHousing" style="display:block;margin:10px auto 0;background:#ff4d4d;color:#fff;border:none;border-radius:8px;padding:8px 20px;font-weight:bold">إغلاق</button>
+</div></div>
+
+<div id="codesPanel"><div id="shopBox" style="text-align:center">
+  <h3>🎟️ أدخل كود</h3>
+  <input id="codeInput" placeholder="اكتب الكود هنا">
+  <button class="go" id="redeemBtn">استبدال</button>
+  <div id="codeMsg"></div>
+  <button id="closeCodes">إغلاق</button>
+</div></div>
+
+<div id="shopPanel"><div id="shopBox">
+  <h3>👕 ملابس</h3>
+  <div id="clothesList"></div>
+  <h3>🔫 أسلحة</h3>
+  <div id="weaponsList"></div>
+  <h3>🚗 سيارات فاخرة</h3>
+  <div id="carsList"></div>
+  <h3>🛋️ احتياجات المنزل</h3>
+  <div id="furnitureList"></div>
+  <h3>🚨 أدوات خاصة</h3>
+  <div class="shopItem"><span>🗡️ أداة تهديد وسرقة (تطلبها للبنك)</span><button id="buyThreatTool">شراء (750 💰)</button></div>
+  <button id="closeShop">إغلاق</button>
+</div></div>
+
+<div id="jobPanel" style="display:none;position:fixed;inset:0;z-index:20;background:#000c;align-items:center;justify-content:center;"><div id="shopBox">
+  <h3>💼 اختر وظيفتك</h3>
+  <div id="jobsList"></div>
+  <button id="resignJobBtn" style="background:#ff4d4d;color:#fff;border:none;border-radius:8px;padding:8px 20px;font-weight:bold;width:100%;margin-top:10px;display:none;cursor:pointer;">🚪 استقالة / ترك الوظيفة</button>
+  <button id="closeJob" style="margin-top:8px;">إغلاق</button>
+</div></div>
+
+<button id="sirenBtn">🚨 تشغيل السفتي</button>
+<button id="phoneBtn">📱</button>
+<div id="phone"><div class="ph-top"><span id="phClock">12:00</span><span>📶 🔋</span></div><div id="phScreen"></div><div class="ph-bottom"><button id="phHome">🏠</button><button id="phClose">✕</button></div></div>
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+let scene, camera, renderer, player, playerBody, playerArm, playerGun;
+let dashboardGroup, steeringWheelGroup, carViewMode = 'third';
+
+let coins = 500;
+let bankBalance = 0;
+let hasThreatTool = false;
+let isRobbingBank = false;
+let bankClosedManually = false;
+let isWanted = false;
+let prisonTimeLeft = 0;
+
+let owned = {clothes:['blue'], weapons:['pistol'], cars:[], furniture:[]};
+const allCarsInfo = {
+  toyota: {id:'toyota', name:'🚗 سيارة تويوتا'},
+  bmw: {id:'bmw', name:'🏎️ سيارة BMW'},
+  lambo: {id:'lambo', name:'⚡ سيارة لامبورغيني'}
+};
+let spawnedOwnedCars = {};
+function summonOwnedCar(carId){
+  if(!owned.cars) owned.cars = [];
+  if(!owned.cars.includes(carId)) owned.cars.push(carId);
+  if(inCar) toggleCar();
+  const pp = player.position;
+  const ang = player.rotation.y || 0;
+  const sx = pp.x + Math.sin(ang)*4 + 2;
+  const sz = pp.z + Math.cos(ang)*4 + 2;
+  let carObj = spawnedOwnedCars[carId];
+  if(!carObj){
+    carObj = makeCar(carId);
+    scene.add(carObj.group);
+    cars.push(carObj);
+    spawnedOwnedCars[carId] = carObj;
+  }
+  carObj.speed = 0;
+  carObj.group.position.set(sx, 0.4, sz);
+  carObj.group.rotation.y = ang;
+  saveGameData();
+  return carObj;
+}
+
+let equipped = {clothes:'blue', weapons:'pistol'};
+let smallAptOwned = false;
+let burjAptOwned = false;
+let houseOwned = false;
+let currentHome = null;
+let currentJob = null;
+function isPoliceJob(){ return ['police','swat','traffic','chief'].includes(currentJob); }
+
+let usedCodes = new Set();
+let flyUnlocked = false;
+let fastUnlocked = false;
+let isFlying = false;
+let isFastActive = false;
+
+function saveGameData(){
+  try {
+    const data = {
+      coins,
+      bankBalance,
+      hasThreatTool,
+      owned,
+      equipped,
+      smallAptOwned,
+      burjAptOwned,
+      houseOwned,
+      currentHome,
+      currentJob,
+      usedCodes: Array.from(usedCodes),
+      flyUnlocked,
+      fastUnlocked,
+      isFlying,
+      isFastActive
+    };
+    localStorage.setItem('openWorldGameSave_v6_5_4', JSON.stringify(data));
+  } catch(e){ console.log(e); }
+}
+
+function loadGameData(){
+  try {
+    const saved = localStorage.getItem('openWorldGameSave_v6_5_4');
+    if(!saved) return;
+    const data = JSON.parse(saved);
+    if(data.coins !== undefined) coins = data.coins;
+    if(data.bankBalance !== undefined) bankBalance = data.bankBalance;
+    if(data.hasThreatTool !== undefined) hasThreatTool = data.hasThreatTool;
+    if(data.owned) owned = data.owned;
+    if(data.equipped) equipped = data.equipped;
+    if(data.smallAptOwned !== undefined) smallAptOwned = data.smallAptOwned;
+    if(data.burjAptOwned !== undefined) burjAptOwned = data.burjAptOwned;
+    if(data.houseOwned !== undefined) houseOwned = data.houseOwned;
+    if(data.currentHome !== undefined) currentHome = data.currentHome;
+    if(data.currentJob !== undefined) currentJob = data.currentJob;
+    if(data.usedCodes) usedCodes = new Set(data.usedCodes);
+    
+    if(data.flyUnlocked !== undefined){
+      flyUnlocked = data.flyUnlocked;
+      if(flyUnlocked){
+        document.getElementById('flyControls').style.display = 'flex';
+        isFlying = data.isFlying || false;
+        const toggleFlyBtn = document.getElementById('toggleFlyBtn');
+        if(toggleFlyBtn){
+          toggleFlyBtn.textContent = isFlying ? '🪽 إيقاف الطيران' : '🪽 طيران';
+          toggleFlyBtn.style.background = isFlying ? '#ff9f43' : '#2ecc71';
+        }
+      }
+    }
+
+    if(data.fastUnlocked !== undefined){
+      fastUnlocked = data.fastUnlocked;
+      if(fastUnlocked){
+        document.getElementById('speedControls').style.display = 'flex';
+        isFastActive = data.isFastActive || false;
+        const toggleSpeedBtn = document.getElementById('toggleSpeedBtn');
+        if(toggleSpeedBtn){
+          toggleSpeedBtn.textContent = isFastActive ? '⚡ إيقاف السرعة' : '⚡ سرعة خارقة';
+          toggleSpeedBtn.style.background = isFastActive ? '#e74c3c' : '#2ecc71';
+        }
+      }
+    }
+
+    if(document.getElementById('coinsVal')) document.getElementById('coinsVal').textContent = coins;
+    if(document.getElementById('bankVal')) document.getElementById('bankVal').textContent = bankBalance;
+    if(equipped.clothes && shirtMat){
+      const cObj = clothes.find(x => x.id === equipped.clothes);
+      if(cObj) shirtMat.color.setHex(cObj.color);
+    }
+    if(equipped.weapons && gunParts){
+      if(!gunParts[equipped.weapons]) equipped.weapons = 'pistol';
+      Object.keys(gunParts).forEach(k=> gunParts[k].visible = (k===equipped.weapons));
+    }
+    if(currentHome){
+      updateLocationButtons();
+    }
+    if(currentJob){
+      const jObj = jobs.find(x => x.id === currentJob);
+      if(jObj){
+        document.getElementById('jobStatus').style.display='block';
+        document.getElementById('jobStatus').textContent = 'الوظيفة: '+jObj.name;
+      }
+    }
+    if(owned.cars && owned.cars.length){
+      owned.cars.forEach((carId, idx)=>{
+        const ownedCar = makeCar(carId);
+        ownedCar.group.position.set(player.position.x + 3 + idx*2.5, 0.4, player.position.z + 3);
+        scene.add(ownedCar.group);
+        cars.push(ownedCar);
+        spawnedOwnedCars[carId] = ownedCar;
+      });
+    }
+  } catch(e){ console.log(e); }
+}
+
+addEventListener('visibilitychange', ()=>{ if(document.hidden) saveGameData(); });
+addEventListener('pagehide', saveGameData);
+addEventListener('beforeunload', saveGameData);
+
+let cars = [], buildings = [], showCar = null, landmarks = [], labelEls = [];
+let npcs = [];
+let inCar = null;
+let velocity = {x:0,y:0,z:0};
+let camYaw = 0;
+let camPitch = 0.38;
+let camDragging = false;
+let camLastX = 0, camLastY = 0;
+let camPointerId = null;
+const camSensitivity = 0.006;
+let onGround = true;
+let keys = {};
+addEventListener('keydown', e=>keys[e.key.toLowerCase()]=true);
+addEventListener('keyup', e=>keys[e.key.toLowerCase()]=false);
+
+let joyVec = {x:0,y:0};
+const joy = document.getElementById('joy');
+const joyStick = document.getElementById('joyStick');
+let joyActive=false, joyCenter={x:0,y:0};
+function joyStart(e){ joyActive=true; const r=joy.getBoundingClientRect(); joyCenter={x:r.left+r.width/2,y:r.top+r.height/2}; }
+function joyMove(e){
+  if(!joyActive) return;
+  const t = e.touches? e.touches[0]:e;
+  let dx=t.clientX-joyCenter.x, dy=t.clientY-joyCenter.y;
+  const dist=Math.min(40,Math.hypot(dx,dy));
+  const ang=Math.atan2(dy,dx);
+  joyVec={x:Math.cos(ang)*(dist/40), y:Math.sin(ang)*(dist/40)};
+  joyStick.style.left=(31+Math.cos(ang)*dist)+'px';
+  joyStick.style.top=(31+Math.sin(ang)*dist)+'px';
+}
+function joyEnd(){ joyActive=false; joyVec={x:0,y:0}; joyStick.style.left='31px'; joyStick.style.top='31px'; }
+joy.addEventListener('touchstart', joyStart);
+joy.addEventListener('touchmove', joyMove);
+joy.addEventListener('touchend', joyEnd);
+
+let wantJump=false;
+document.getElementById('jumpBtn').addEventListener('touchstart', e=>{e.preventDefault(); wantJump=true;});
+document.getElementById('jumpBtn').addEventListener('mousedown', ()=>wantJump=true);
+
+document.getElementById('carBtn').addEventListener('click', toggleCar);
+addEventListener('keydown', e=>{ if(e.key.toLowerCase()==='e') toggleCar(); });
+
+let wantBrake=false;
+const brakeBtn = document.getElementById('brakeBtn');
+brakeBtn.addEventListener('touchstart', e=>{e.preventDefault(); wantBrake=true;});
+brakeBtn.addEventListener('touchend', ()=> wantBrake=false);
+brakeBtn.addEventListener('mousedown', ()=> wantBrake=true);
+brakeBtn.addEventListener('mouseup', ()=> wantBrake=false);
+addEventListener('keydown', e=>{ if(e.key===' ') wantBrake=true; });
+addEventListener('keyup', e=>{ if(e.key===' ') wantBrake=false; });
+let wantReverse=false;
+const reverseBtn=document.getElementById('reverseBtn');
+reverseBtn.addEventListener('touchstart',e=>{e.preventDefault();wantReverse=true;});
+reverseBtn.addEventListener('touchend',()=>wantReverse=false);
+reverseBtn.addEventListener('touchcancel',()=>wantReverse=false);
+reverseBtn.addEventListener('mousedown',()=>wantReverse=true);
+reverseBtn.addEventListener('mouseup',()=>wantReverse=false);
+reverseBtn.addEventListener('mouseleave',()=>wantReverse=false);
+addEventListener('keydown',e=>{if(e.key.toLowerCase()==='r')wantReverse=true;});
+addEventListener('keyup',e=>{if(e.key.toLowerCase()==='r')wantReverse=false;});
+document.getElementById('exitCarBtn').addEventListener('click',toggleCar);
+
+function setCarViewMode(mode){
+  carViewMode = mode;
+  const btn = document.getElementById('viewToggleBtn');
+  if(mode==='first'){
+    dashboardGroup.visible = true;
+    if(inCar) inCar.group.visible = false;
+    btn.textContent = '📷 المنظور الثالث';
+  } else {
+    dashboardGroup.visible = false;
+    if(inCar) inCar.group.visible = true;
+    btn.textContent = '📷 المنظور الأول';
+  }
+}
+document.getElementById('viewToggleBtn').addEventListener('click', ()=>{
+  setCarViewMode(carViewMode==='third' ? 'first' : 'third');
+});
+
+let isAtHome = false;
+const citySpawn = {x:0, y:0, z:20};
+const homeSpawns = {
+  smallApt: {x:165, y:0, z:155, label:'🏢 الذهاب لشقتي الصغيرة'},
+  burjApt:  {x:185, y:0, z:-145, label:'🏙️ الذهاب لشقة برج خليفة'},
+  house:    {x:-180, y:0, z:160, label:'🏰 الذهاب إلى قصري'}
+};
+
+function updateLocationButtons(){
+  const homeBtn = document.getElementById('homeActionBtn');
+  const cityBtn = document.getElementById('cityActionBtn');
+  const sleepBtn = document.getElementById('sleepBtn');
+  if(!currentHome){
+    homeBtn.style.display = 'none';
+    cityBtn.style.display = 'none';
+    sleepBtn.style.display = 'none';
+    return;
+  }
+  if(isWanted){
+    homeBtn.style.display = 'none';
+    homeBtn.disabled = true;
+    cityBtn.style.display = 'none';
+    sleepBtn.style.display = 'none';
+    return;
+  }
+  homeBtn.disabled = false;
+  if(isAtHome){
+    cityBtn.style.display = 'block';
+    homeBtn.style.display = 'none';
+    sleepBtn.style.display = 'block';
+  } else {
+    cityBtn.style.display = 'none';
+    homeBtn.textContent = homeSpawns[currentHome].label;
+    homeBtn.style.display = 'block';
+    sleepBtn.style.display = 'none';
+  }
+}
+document.getElementById('sleepBtn').addEventListener('click', trySleep);
+
+function goToCity(){
+  if(!player) return;
+  if(inCar) toggleCar();
+  player.position.set(citySpawn.x, citySpawn.y, citySpawn.z);
+  velocity = {x:0,y:0,z:0};
+  isAtHome = false;
+  camYaw = 0;
+  updateLocationButtons();
+}
+
+function goToHome(){
+  if(!currentHome || !player) return;
+  if(isWanted){
+    toast('🚨 الشرطة تطاردك! اهرب إلى بيتك سيراً أو بالسيارة أولاً!');
+    return;
+  }
+  if(inCar) toggleCar();
+  const spot = homeSpawns[currentHome];
+  player.position.set(spot.x, spot.y, spot.z);
+  velocity = {x:0,y:0,z:0};
+  isAtHome = true;
+  camYaw = 0;
+  updateLocationButtons();
+}
+
+function escapePoliceAtHome(){
+  if(!isWanted) return;
+  isWanted = false;
+  addCoins(100);
+  policeCars.forEach(c=>{
+    if(c.task && (c.task.robbery || c.task.chase)) c.task = null;
+    c.sirenOn = false;
+  });
+  updateLocationButtons();
+  toast('🎉 تم الهروب من الشرطة! +100 عملة');
+}
+
+document.getElementById('homeActionBtn').addEventListener('click', goToHome);
+document.getElementById('cityActionBtn').addEventListener('click', goToCity);
+
+function moveIntoPurchasedHome(type){
+  currentHome = type;
+  document.getElementById('housingPanel').style.display = 'none';
+  saveGameData();
+  goToHome();
+}
+
+let homeDoors = {}, homeFurniture = {}, bedSpots = {}, isSleeping = false;
+
+function buildHome(key, cx, cz, half, wallColor, floorColor, fancy){
+  const wallMat = new THREE.MeshStandardMaterial({color:wallColor, roughness:0.8});
+  const floorMat = new THREE.MeshStandardMaterial({color:floorColor, roughness:0.6});
+  const h = fancy ? 5.5 : 3.6;
+  const grp = new THREE.Group();
+  grp.position.set(cx, 0, cz);
+  scene.add(grp);
+
+  const floor = new THREE.Mesh(new THREE.BoxGeometry(half*2,0.2,half*2), floorMat);
+  floor.position.y = 0.1; floor.receiveShadow = true; grp.add(floor);
+  const ceil = new THREE.Mesh(new THREE.BoxGeometry(half*2,0.2,half*2), wallMat);
+  ceil.position.y = h; grp.add(ceil);
+
+  [[0,-half,0],[half,0,Math.PI/2],[-half,0,Math.PI/2]].forEach(([x,z,ry])=>{
+    const wall = new THREE.Mesh(new THREE.BoxGeometry(half*2,h,0.2), wallMat);
+    wall.position.set(x,h/2,z); wall.rotation.y = ry; grp.add(wall);
+  });
+  const doorGapW = 1.4;
+  const sideW = (half*2 - doorGapW)/2;
+  const wallFrontL = new THREE.Mesh(new THREE.BoxGeometry(sideW,h,0.2), wallMat);
+  wallFrontL.position.set(-half + sideW/2, h/2, half); grp.add(wallFrontL);
+  const wallFrontR = new THREE.Mesh(new THREE.BoxGeometry(sideW,h,0.2), wallMat);
+  wallFrontR.position.set(half - sideW/2, h/2, half); grp.add(wallFrontR);
+  const lintel = new THREE.Mesh(new THREE.BoxGeometry(doorGapW,h-2.2,0.2), wallMat);
+  lintel.position.set(0, h-((h-2.2)/2), half); grp.add(lintel);
+
+  const doorMat = new THREE.MeshStandardMaterial({color:0x5a3b22, roughness:0.6});
+  const doorHinge = new THREE.Group();
+  doorHinge.position.set(-doorGapW/2, 0, half);
+  grp.add(doorHinge);
+  const doorMesh = new THREE.Mesh(new THREE.BoxGeometry(doorGapW,2.15,0.12), doorMat);
+  doorMesh.position.set(doorGapW/2, 1.08, 0);
+  doorHinge.add(doorMesh);
+  homeDoors[key] = {hinge:doorHinge, openRot:-Math.PI/1.7};
+
+  const bedFrameMat = new THREE.MeshStandardMaterial({color:0x6b4a2f});
+  const bedFrame = new THREE.Mesh(new THREE.BoxGeometry(1.7,0.35,2.4), bedFrameMat);
+  bedFrame.position.set(half-1.1, 0.3, -half+1.4); grp.add(bedFrame);
+  const mattress = new THREE.Mesh(new THREE.BoxGeometry(1.6,0.25,2.3), new THREE.MeshStandardMaterial({color:fancy?0xf2e6d8:0xeeeeee}));
+  mattress.position.set(half-1.1, 0.58, -half+1.4); grp.add(mattress);
+  const pillow = new THREE.Mesh(new THREE.BoxGeometry(1.3,0.18,0.5), new THREE.MeshStandardMaterial({color:0xffffff}));
+  pillow.position.set(half-1.1, 0.75, -half+0.45); grp.add(pillow);
+  bedSpots[key] = new THREE.Vector3(cx+half-1.1, 0.75, cz-half+1.4);
+
+  const woodMat = new THREE.MeshStandardMaterial({color:0x4a3220});
+  const wardrobe = new THREE.Mesh(new THREE.BoxGeometry(1.1,2.2,0.6), woodMat);
+  wardrobe.position.set(-half+0.6, 1.1, -half+0.35); grp.add(wardrobe);
+  const table = new THREE.Mesh(new THREE.BoxGeometry(0.7,0.5,0.7), woodMat);
+  table.position.set(-half+0.9, 0.25, half-0.9); grp.add(table);
+  const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.12,8,8), new THREE.MeshStandardMaterial({color:0xfff4cc, emissive:0xffdd88, emissiveIntensity:0.8}));
+  lamp.position.set(-half+0.9, 0.6, half-0.9); grp.add(lamp);
+
+  const win = new THREE.Mesh(new THREE.BoxGeometry(1.8,1.3,0.08), new THREE.MeshStandardMaterial({color:0x9bd2f5, emissive:0x3a6b8a, emissiveIntensity:0.4}));
+  win.position.set(half-0.11,h*0.55,-half*0.3); win.rotation.y = Math.PI/2; grp.add(win);
+
+  const furn = {};
+  const sofa = new THREE.Mesh(new THREE.BoxGeometry(1.8,0.6,0.8), new THREE.MeshStandardMaterial({color:0x8a2b2b}));
+  sofa.position.set(0, 0.3, -half+0.6); sofa.visible=false; grp.add(sofa); furn.sofa = sofa;
+  const tv = new THREE.Mesh(new THREE.BoxGeometry(1.3,0.8,0.08), new THREE.MeshStandardMaterial({color:0x111111, emissive:0x2266ff, emissiveIntensity:0.5}));
+  tv.position.set(0,1.3,-half+0.14); tv.visible=false; grp.add(tv); furn.tv = tv;
+  const chand = new THREE.Mesh(new THREE.TorusGeometry(0.35,0.05,8,16), new THREE.MeshStandardMaterial({color:0xffd700, emissive:0xffcc33, emissiveIntensity:0.9}));
+  chand.position.set(0,h-0.6,0); chand.rotation.x=Math.PI/2; chand.visible=false; grp.add(chand); furn.chandelier = chand;
+  const plantPot = new THREE.Mesh(new THREE.CylinderGeometry(0.22,0.18,0.3,8), new THREE.MeshStandardMaterial({color:0x7a4a2a}));
+  plantPot.position.set(half-0.5,0.15,half-0.5); plantPot.visible=false; grp.add(plantPot); furn.plant = plantPot;
+  const plantLeaf = new THREE.Mesh(new THREE.ConeGeometry(0.35,0.8,8), new THREE.MeshStandardMaterial({color:0x2e7d32}));
+  plantLeaf.position.set(half-0.5,0.7,half-0.5); plantLeaf.visible=false; grp.add(plantLeaf); furn.plant2 = plantLeaf;
+  homeFurniture[key] = furn;
+}
+
+function updateDoors(dt){
+  Object.keys(homeDoors).forEach(key=>{
+    const d = homeDoors[key];
+    const target = (currentHome===key && isAtHome) ? d.openRot : 0;
+    d.hinge.rotation.y += (target - d.hinge.rotation.y) * Math.min(1, dt*5);
+  });
+}
+
+const furnitureItems = [
+  {id:'sofa', name:'🛋️ كنبة فاخرة', cost:1200},
+  {id:'tv', name:'📺 تلفزيون ذكي', cost:800},
+  {id:'chandelier', name:'💡 ثريا فخمة', cost:3000},
+  {id:'plant', name:'🪴 نبتة ديكور', cost:150}
+];
+function updateFurnitureVisibility(){
+  if(!owned.furniture) owned.furniture = [];
+  Object.values(homeFurniture).forEach(furn=>{
+    furnitureItems.forEach(it=>{
+      const owns = owned.furniture.includes(it.id);
+      if(furn[it.id]) furn[it.id].visible = owns;
+      if(it.id==='plant' && furn.plant2) furn.plant2.visible = owns;
+    });
+  });
+}
+
+function trySleep(){
+  if(!isAtHome || isSleeping) return;
+  isSleeping = true;
+  if(currentHome && bedSpots[currentHome]) player.position.copy(bedSpots[currentHome]);
+  player.visible = false;
+  const ov = document.getElementById('sleepOverlay');
+  ov.style.display='flex';
+  requestAnimationFrame(()=> ov.style.opacity='1');
+  setTimeout(()=>{
+    ov.style.opacity='0';
+    setTimeout(()=>{
+      ov.style.display='none';
+      player.visible = true;
+      isSleeping = false;
+    }, 600);
+  }, 2200);
+}
+
+function renderHousing(){
+  const msg = document.getElementById('housingMsg');
+  document.getElementById('buySmallAptBtn').textContent = smallAptOwned ? '✅ مملوكة (انتقل إليها)' : 'شراء الشقة الصغيرة (50 ريال)';
+  document.getElementById('buyBurjAptBtn').textContent = burjAptOwned ? '✅ مملوكة (انتقل إليها)' : 'شراء شقة برج خليفة (50,000 ريال)';
+  document.getElementById('buyHouseBtn').textContent = houseOwned ? '✅ القصر ملكك (انتقل إليه)' : 'شراء القصر (18,000 ريال)';
+  
+  let ownedNames = [];
+  if(smallAptOwned) ownedNames.push('الشقة الصغيرة');
+  if(burjAptOwned) ownedNames.push('شقة برج خليفة');
+  if(houseOwned) ownedNames.push('القصر');
+  
+  if(ownedNames.length > 0){
+    msg.textContent = 'ملكياتك مدى الحياة: ' + ownedNames.join(' ، ');
+  } else {
+    msg.textContent = 'اختر العقار الذي يناسبك — جميعها ملكك مدى الحياة!';
+  }
+}
+
+document.getElementById('housingBtn').addEventListener('click', ()=>{
+  document.getElementById('housingPanel').style.display = 'flex';
+  renderHousing();
+});
+document.getElementById('closeHousing').addEventListener('click', ()=>{
+  document.getElementById('housingPanel').style.display = 'none';
+});
+
+document.getElementById('buySmallAptBtn').addEventListener('click', ()=>{
+  if(smallAptOwned){
+    moveIntoPurchasedHome('smallApt');
+    return;
+  }
+  if(coins < 50){
+    document.getElementById('housingMsg').textContent = '❌ تحتاج 50 ريال لشراء الشقة الصغيرة.';
+    return;
+  }
+  coins -= 50;
+  smallAptOwned = true;
+  document.getElementById('coinsVal').textContent = coins;
+  saveGameData();
+  renderHousing();
+  moveIntoPurchasedHome('smallApt');
+});
+
+document.getElementById('buyBurjAptBtn').addEventListener('click', ()=>{
+  if(burjAptOwned){
+    moveIntoPurchasedHome('burjApt');
+    return;
+  }
+  if(coins < 50000){
+    document.getElementById('housingMsg').textContent = '❌ تحتاج 50,000 ريال لشراء شقة برج خليفة.';
+    return;
+  }
+  coins -= 50000;
+  burjAptOwned = true;
+  document.getElementById('coinsVal').textContent = coins;
+  saveGameData();
+  renderHousing();
+  moveIntoPurchasedHome('burjApt');
+});
+
+document.getElementById('buyHouseBtn').addEventListener('click', ()=>{
+  if(houseOwned){
+    moveIntoPurchasedHome('house');
+    return;
+  }
+  if(coins < 18000){
+    document.getElementById('housingMsg').textContent = '❌ تحتاج 18,000 ريال لشراء القصر.';
+    return;
+  }
+  coins -= 18000;
+  houseOwned = true;
+  document.getElementById('coinsVal').textContent = coins;
+  saveGameData();
+  renderHousing();
+  moveIntoPurchasedHome('house');
+});
+
+let wantFire=false;
+document.getElementById('fireBtn').addEventListener('touchstart', e=>{e.preventDefault(); wantFire=true;});
+document.getElementById('fireBtn').addEventListener('mousedown', ()=>wantFire=true);
+addEventListener('keydown', e=>{ if(e.key==='f'||e.key==='F') wantFire=true; });
+let bullets=[], muzzleFlashTimer=0, smokeParticles=[];
+function spawnSmoke(pos){
+  const mat = new THREE.MeshStandardMaterial({color:0xcccccc, transparent:true, opacity:0.55});
+  const mesh = new THREE.Mesh(new THREE.SphereGeometry(0.25,6,6), mat);
+  mesh.position.copy(pos);
+  scene.add(mesh);
+  smokeParticles.push({mesh, life:30});
+}
+function updateSmoke(){
+  smokeParticles.forEach(s=>{
+    s.life--;
+    s.mesh.scale.multiplyScalar(1.04);
+    s.mesh.material.opacity *= 0.93;
+    s.mesh.position.y += 0.01;
+  });
+  smokeParticles = smokeParticles.filter(s=>{
+    if(s.life<=0){ scene.remove(s.mesh); return false; }
+    return true;
+  });
+}
+let shirtMat, pantsMat, hairMat, gunParts={};
+const clothes = [
+  {id:'blue', name:'قميص أزرق', color:0x2d4a6b, cost:0},
+  {id:'red', name:'قميص أحمر', color:0xb33939, cost:150},
+  {id:'black', name:'قميص أسود', color:0x222222, cost:200},
+  {id:'camo', name:'قميص عسكري', color:0x4a5e3a, cost:300}
+];
+const weapons = [
+  {id:'pistol', name:'مسدس مطور (أساسي)', cost:0, dmg:1.25},
+  {id:'rifle', name:'بندقية قنص مطورة', cost:400, dmg:2.5},
+  {id:'smg1000', name:'رشاش تكتيكي (3 طلقات)', cost:1000, dmg:1.7},
+  {id:'burst1200', name:'رشاش خفيف (5 طلقات للقتل)', cost:1200, dmg:1.0},
+  {id:'secret', name:'⚡ السلاح السري (طلقة واحدة)', cost:0, dmg:999, secret:true}
+];
+
+function renderShop(){
+  document.getElementById('coinsVal').textContent = coins;
+  const cList = document.getElementById('clothesList');
+  cList.innerHTML='';
+  clothes.forEach(c=>{
+    const isOwned = owned.clothes.includes(c.id);
+    const isEq = equipped.clothes===c.id;
+    const div = document.createElement('div');
+    div.className='shopItem';
+    div.innerHTML = `<span>${c.name}${c.cost?' - 💰'+c.cost:''}</span>`;
+    const btn = document.createElement('button');
+    btn.textContent = isEq? 'ملبوس' : (isOwned? 'لبس':'شراء');
+    if(isEq) btn.classList.add('owned');
+    btn.onclick = ()=>{
+      if(!isOwned){
+        if(coins<c.cost) return;
+        coins -= c.cost; owned.clothes.push(c.id);
+      }
+      equipped.clothes = c.id;
+      shirtMat.color.setHex(c.color);
+      saveGameData();
+      renderShop();
+    };
+    div.appendChild(btn);
+    cList.appendChild(div);
+  });
+  const wList = document.getElementById('weaponsList');
+  wList.innerHTML='';
+  weapons.forEach(w=>{
+    const isOwned = owned.weapons.includes(w.id);
+    if(w.secret && !isOwned) return;
+    const isEq = equipped.weapons===w.id;
+    const div = document.createElement('div');
+    div.className='shopItem';
+    div.innerHTML = `<span>${w.name}${w.cost?' - 💰'+w.cost:''}</span>`;
+    const btn = document.createElement('button');
+    btn.textContent = isEq? 'مجهز' : (isOwned? 'تجهيز':'شراء');
+    if(isEq) btn.classList.add('owned');
+    btn.onclick = ()=>{
+      if(!isOwned){
+        if(coins<w.cost) return;
+        coins -= w.cost; owned.weapons.push(w.id);
+      }
+      equipped.weapons = w.id;
+      Object.keys(gunParts).forEach(k=> gunParts[k].visible = (k===w.id));
+      saveGameData();
+      renderShop();
+    };
+    div.appendChild(btn);
+    wList.appendChild(div);
+  });
+
+  const carCatalog = {
+    toyota: {id:'toyota', name:'🚗 سيارة تويوتا (اقتصادية)', cost:400},
+    bmw: {id:'bmw', name:'🏎️ سيارة BMW', cost:100000},
+    lambo: {id:'lambo', name:'⚡ سيارة لامبورغيني', cost:1000000}
+  };
+  const carShopItems = Object.values(carCatalog);
+  if(!owned.cars) owned.cars = [];
+  const cShopList = document.getElementById('carsList');
+  cShopList.innerHTML='';
+  carShopItems.forEach(carItem=>{
+    const isOwned = owned.cars.includes(carItem.id);
+    const div = document.createElement('div');
+    div.className='shopItem';
+    div.innerHTML = `<span>${carItem.name} - 💰${carItem.cost.toLocaleString()}</span>`;
+    const btn = document.createElement('button');
+    btn.textContent = isOwned ? '✨ امتلاك (ركوب)' : 'شراء';
+    if(isOwned) btn.classList.add('owned');
+    btn.onclick = ()=>{
+      if(!isOwned){
+        if(coins < carItem.cost) return;
+        coins -= carItem.cost;
+        owned.cars.push(carItem.id);
+      }
+      summonOwnedCar(carItem.id);
+      toast('✅ تم إضافة السيارة إلى الكراج واستدعاؤها!');
+      renderShop();
+      document.getElementById('shopPanel').style.display='none';
+    };
+    div.appendChild(btn);
+    cShopList.appendChild(div);
+  });
+
+  if(!owned.furniture) owned.furniture = [];
+  const fList = document.getElementById('furnitureList');
+  fList.innerHTML='';
+  furnitureItems.forEach(it=>{
+    const isOwned = owned.furniture.includes(it.id);
+    const div = document.createElement('div');
+    div.className='shopItem';
+    div.innerHTML = `<span>${it.name} - 💰${it.cost}</span>`;
+    const btn = document.createElement('button');
+    btn.textContent = isOwned ? '✅ موجودة' : 'شراء';
+    if(isOwned) btn.classList.add('owned');
+    btn.onclick = ()=>{
+      if(isOwned) return;
+      if(coins < it.cost) return;
+      coins -= it.cost; owned.furniture.push(it.id);
+      document.getElementById('coinsVal').textContent = coins;
+      updateFurnitureVisibility();
+      saveGameData();
+      renderShop();
+    };
+    div.appendChild(btn);
+    fList.appendChild(div);
+  });
+
+  const threatBtn = document.getElementById('buyThreatTool');
+  if(hasThreatTool){
+    threatBtn.textContent = '✅ ممتلكة';
+    threatBtn.classList.add('owned');
+  } else {
+    threatBtn.textContent = 'شراء (750 💰)';
+    threatBtn.onclick = ()=>{
+      if(hasThreatTool) return;
+      if(coins < 750){ toast('❌ لا تملك 750 عملة كافية!'); return; }
+      coins -= 750;
+      hasThreatTool = true;
+      document.getElementById('coinsVal').textContent = coins;
+      saveGameData();
+      toast('🗡️ تمتلك الآن أداة التهديد لسرقة بنك الراجحي!');
+      renderShop();
+    };
+  }
+}
+document.getElementById('shopBtn').addEventListener('click', ()=>{
+  document.getElementById('shopPanel').style.display='flex';
+  renderShop();
+});
+document.getElementById('closeShop').addEventListener('click', ()=>{
+  document.getElementById('shopPanel').style.display='none';
+});
+
+const jobs = [
+  {id:'police', name:'👮 شرطي', desc:'دوريات أمنية بالمدينة — 500 ريال لكل مهمة'},
+  {id:'swat', name:'🚓 تدخل سريع', desc:'الاستجابة السريعة للبلاغات'},
+  {id:'traffic', name:'🚦 مرور', desc:'تنظيم الحركة بالشوارع'},
+  {id:'chief', name:'⭐ قائد شرطة', desc:'قيادة فريق الشرطة'},
+  {id:'taxi', name:'🚕 سائق تاكسي', desc:'وصّل الركاب للمباني — 800 ريال لكل توصيلة'},
+  {id:'delivery', name:'🍔 موصّل طلبات', desc:'وصّل الطلبات للمباني — 400 ريال لكل توصيلة'}
+];
+let deliveryTarget = null, deliveryMarker = null;
+setInterval(()=>{
+  if(!currentJob) return;
+  const pay={police:500,swat:650,traffic:550,chief:900}[currentJob];
+  if(pay){
+    coins+=pay;
+    document.getElementById('coinsVal').textContent=coins;
+    document.getElementById('jobStatus').textContent='💰 استلمت راتب '+pay+' ريال';
+    saveGameData();
+  }
+},30000);
+
+function renderJobs(){
+  const list = document.getElementById('jobsList');
+  list.innerHTML='';
+  jobs.forEach(j=>{
+    const div = document.createElement('div');
+    div.className='shopItem';
+    div.innerHTML = `<span>${j.name}<br><small style="opacity:.7">${j.desc}</small></span>`;
+    const btn = document.createElement('button');
+    btn.textContent = currentJob===j.id? 'مجهز' : 'اختيار';
+    if(currentJob===j.id) btn.classList.add('owned');
+    btn.onclick = ()=>{
+      currentJob = j.id;
+      document.getElementById('jobStatus').style.display='block';
+      document.getElementById('jobStatus').textContent = 'الوظيفة: '+j.name;
+      if(j.id==='taxi' || j.id==='delivery'){ pickNewDeliveryTarget(); }
+      else { clearDeliveryTarget(); }
+      if(!isPoliceJob()){
+        activeMissionPair = null;
+        fightPairs.forEach(p => p.accepted = false);
+      }
+      if(phoneOpen) renderPhone();
+      saveGameData();
+      document.getElementById('jobPanel').style.display='none';
+      renderJobs();
+    };
+    div.appendChild(btn);
+    list.appendChild(div);
+  });
+
+  const resignBtn = document.getElementById('resignJobBtn');
+  if(currentJob){
+    resignBtn.style.display = 'block';
+  } else {
+    resignBtn.style.display = 'none';
+  }
+}
+
+document.getElementById('resignJobBtn').addEventListener('click', ()=>{
+  if(!currentJob) return;
+  currentJob = null;
+  clearDeliveryTarget();
+  document.getElementById('jobStatus').style.display = 'none';
+  saveGameData();
+  toast('🚪 قدمت استقالتك وأصبحت حراً بدون وظيفة!');
+  document.getElementById('jobPanel').style.display = 'none';
+  renderJobs();
+});
+
+document.getElementById('jobBtn').addEventListener('click', ()=>{
+  document.getElementById('jobPanel').style.display='flex';
+  renderJobs();
+});
+document.getElementById('closeJob').addEventListener('click', ()=>{
+  document.getElementById('jobPanel').style.display='none';
+});
+
+function clearDeliveryTarget(){
+  if(deliveryMarker) scene.remove(deliveryMarker);
+  deliveryMarker = null; deliveryTarget = null;
+}
+function pickNewDeliveryTarget(){
+  clearDeliveryTarget();
+  const spot = landmarks[Math.floor(Math.random()*landmarks.length)];
+  deliveryTarget = {x: spot.pos.x + (Math.random()-0.5)*6, z: spot.pos.z + (Math.random()-0.5)*6};
+  const markMat = new THREE.MeshStandardMaterial({color:0xffe066, emissive:0xffaa00, transparent:true, opacity:0.85});
+  deliveryMarker = new THREE.Mesh(new THREE.ConeGeometry(0.6,1.6,8), markMat);
+  deliveryMarker.position.set(deliveryTarget.x, 5, deliveryTarget.z);
+  scene.add(deliveryMarker);
+  document.getElementById('jobStatus').textContent = (currentJob==='taxi'? '🚕 وصّل الراكب' : '🍔 وصّل الطلب') + ' → اتبع العلامة الصفراء';
+}
+function updateDelivery(){
+  if(!deliveryTarget) return;
+  deliveryMarker.rotation.y += 0.05;
+  deliveryMarker.position.y = 4.5 + Math.sin(Date.now()/300)*0.3;
+  const px = inCar? inCar.group.position.x : player.position.x;
+  const pz = inCar? inCar.group.position.z : player.position.z;
+  const d = Math.hypot(px-deliveryTarget.x, pz-deliveryTarget.z);
+  if(d < 4){
+    coins += (currentJob==='taxi' ? 700 : 350);
+    document.getElementById('coinsVal').textContent = coins;
+    saveGameData();
+    pickNewDeliveryTarget();
+  }
+}
+
+const toggleFlyBtn = document.getElementById('toggleFlyBtn');
+if(toggleFlyBtn){
+  toggleFlyBtn.addEventListener('click', ()=>{
+    if(!flyUnlocked) return;
+    isFlying = !isFlying;
+    velocity.y = 0;
+    onGround = false;
+    if(isFlying && player && player.position.y < 1.0){
+      player.position.y = 1.5;
+    }
+    toggleFlyBtn.textContent = isFlying ? '🪽 إيقاف الطيران' : '🪽 طيران';
+    toggleFlyBtn.style.background = isFlying ? '#ff9f43' : '#2ecc71';
+    saveGameData();
+  });
+}
+
+const toggleSpeedBtn = document.getElementById('toggleSpeedBtn');
+if(toggleSpeedBtn){
+  toggleSpeedBtn.addEventListener('click', ()=>{
+    if(!fastUnlocked) return;
+    isFastActive = !isFastActive;
+    toggleSpeedBtn.textContent = isFastActive ? '⚡ إيقاف السرعة' : '⚡ سرعة خارقة';
+    toggleSpeedBtn.style.background = isFastActive ? '#e74c3c' : '#2ecc71';
+    saveGameData();
+  });
+}
+
+let flyUpPressed = false, flyDownPressed = false;
+document.getElementById('flyUpBtn').addEventListener('touchstart', e=>{e.preventDefault(); flyUpPressed=true;});
+document.getElementById('flyUpBtn').addEventListener('touchend', ()=>flyUpPressed=false);
+document.getElementById('flyUpBtn').addEventListener('mousedown', ()=>flyUpPressed=true);
+document.getElementById('flyUpBtn').addEventListener('mouseup', ()=>flyUpPressed=false);
+document.getElementById('flyUpBtn').addEventListener('click', ()=>{ if(player && isFlying) player.position.y += 2.5; });
+
+document.getElementById('flyDownBtn').addEventListener('touchstart', e=>{e.preventDefault(); flyDownPressed=true;});
+document.getElementById('flyDownBtn').addEventListener('touchend', ()=>flyDownPressed=false);
+document.getElementById('flyDownBtn').addEventListener('mousedown', ()=>flyDownPressed=true);
+document.getElementById('flyDownBtn').addEventListener('mouseup', ()=>flyDownPressed=false);
+document.getElementById('flyDownBtn').addEventListener('click', ()=>{ if(player && isFlying) player.position.y = Math.max(0, player.position.y - 2.5); });
+
+addEventListener('keydown', e=>{
+  if(e.key.toLowerCase()==='v' && flyUnlocked){
+    if(toggleFlyBtn) toggleFlyBtn.click();
+  }
+});
+
+const redeemCodes = {
+  'CORD1': {msg:'👑 مبروك! كود 1 كوردليون للمسابقة (1,000,000,000,000,000,000,000,000,000,000 عملة)!', apply:()=>{ coins += 1e30; }},
+  'COINS1400': {msg:'+1400 💰 تمت إضافة العملات بنجاح!', apply:()=>{ coins+=1400; }},
+  'COINS1000': {msg:'+1000 💰 تمت إضافة العملات بنجاح!', apply:()=>{ coins+=1000; }},
+  'FREE100': {msg:'+100 💰', apply:()=>{ coins+=100; }},
+  'GOLD500': {msg:'+500 💰', apply:()=>{ coins+=500; }},
+  'RIFLE': {msg:'🔫 بندقية مجانية!', apply:()=>{ if(!owned.weapons.includes('rifle')) owned.weapons.push('rifle'); }},
+  'SECRET': {msg:'⚡ مبروك! حصلت على السلاح السري (طلقة واحدة تقضي على أي بوت)!', apply:()=>{ if(!owned.weapons.includes('secret')) owned.weapons.push('secret'); equipped.weapons='secret'; Object.keys(gunParts).forEach(k=> gunParts[k].visible = (k==='secret')); }},
+  'CAMO': {msg:'👕 قميص عسكري مجاني!', apply:()=>{ if(!owned.clothes.includes('camo')) owned.clothes.push('camo'); }},
+  'VIP': {msg:'🌟 كود VIP: كل شي انفتح مع السيارات في الكراج!', apply:()=>{ coins+=10000; owned.weapons=['pistol','rifle']; owned.clothes=['blue','red','black','camo']; hasThreatTool=true; if(!owned.cars) owned.cars=[]; ['toyota','bmw','lambo'].forEach(id=>{ if(!owned.cars.includes(id)) owned.cars.push(id); }); }},
+  'TOYOTA': {msg:'🚗 تم فتح سيارة تويوتا وإضافتها للكراج!', apply:()=>{ if(!owned.cars) owned.cars=[]; if(!owned.cars.includes('toyota')) owned.cars.push('toyota'); }},
+  'BMW': {msg:'🏎️ تم فتح سيارة BMW وإضافتها للكراج!', apply:()=>{ if(!owned.cars) owned.cars=[]; if(!owned.cars.includes('bmw')) owned.cars.push('bmw'); }},
+  'LAMBO': {msg:'⚡ تم فتح سيارة لامبورغيني وإضافتها للكراج!', apply:()=>{ if(!owned.cars) owned.cars=[]; if(!owned.cars.includes('lambo')) owned.cars.push('lambo'); }},
+  'CARS': {msg:'🚘 تم فتح جميع السيارات وإضافتها للكراج!', apply:()=>{ if(!owned.cars) owned.cars=[]; ['toyota','bmw','lambo'].forEach(id=>{ if(!owned.cars.includes(id)) owned.cars.push(id); }); }},
+  'MILLION': {msg:'💰 مليون عملة!', apply:()=>{ coins+=1000000; }},
+  'TRILLION': {msg:'🤑 1 تريليون عملة!', apply:()=>{ coins+=1000000000000; }},
+  'FLY': {msg:'🪽 تم تفعيل وضع الطيران! يمكنك تشغيله وإيقافه من الزر الجديد.', apply:()=>{
+    flyUnlocked = true;
+    isFlying = true;
+    document.getElementById('flyControls').style.display = 'flex';
+    if(toggleFlyBtn){
+      toggleFlyBtn.textContent = '🪽 إيقاف الطيران';
+      toggleFlyBtn.style.background = '#ff9f43';
+    }
+    if(player) player.position.y += 10;
+  }},
+  'FAST': {msg:'⚡ تم تفعيل زر السرعة الخارقة!', apply:()=>{
+    fastUnlocked = true;
+    isFastActive = true;
+    document.getElementById('speedControls').style.display = 'flex';
+    if(toggleSpeedBtn){
+      toggleSpeedBtn.textContent = '⚡ إيقاف السرعة';
+      toggleSpeedBtn.style.background = '#e74c3c';
+    }
+  }}
+};
+
+document.getElementById('redeemBtn').addEventListener('click', ()=>{
+  let val = document.getElementById('codeInput').value.trim().toUpperCase();
+  const msgEl = document.getElementById('codeMsg');
+  if(!val){ msgEl.textContent = 'اكتب كود أولاً'; return; }
+  if(val === 'FLAY') val = 'FLY';
+  if(usedCodes.has(val)){ msgEl.textContent = 'هذا الكود مستخدم قبل 😕'; return; }
+  const entry = redeemCodes[val];
+  if(!entry){ msgEl.textContent = 'كود غير صحيح ❄️'; return; }
+  entry.apply();
+  usedCodes.add(val);
+  document.getElementById('coinsVal').textContent = coins;
+  saveGameData();
+  msgEl.textContent = 'تم الاستبدال! '+entry.msg;
+  document.getElementById('codeInput').value='';
+  renderShop();
+});
+
+document.getElementById('codesBtn').addEventListener('click', ()=>{
+  document.getElementById('codesPanel').style.display='flex';
+  document.getElementById('codeMsg').textContent='';
+});
+document.getElementById('closeCodes').addEventListener('click', ()=>{
+  document.getElementById('codesPanel').style.display='none';
+});
+
+function createAsphaltTexture(){
+  const c = document.createElement('canvas');
+  c.width = 256; c.height = 256;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#25272b';
+  ctx.fillRect(0, 0, 256, 256);
+  for(let i=0; i<4000; i++){
+    const v = 25 + Math.floor(Math.random()*30);
+    ctx.fillStyle = `rgb(${v},${v},${v+2})`;
+    ctx.fillRect(Math.random()*256, Math.random()*256, 2, 2);
+  }
+  ctx.fillStyle = '#e5e7eb';
+  ctx.fillRect(6, 0, 4, 256);
+  ctx.fillRect(246, 0, 4, 256);
+  ctx.fillStyle = '#facc15';
+  for(let y=10; y<256; y+=44){
+    ctx.fillRect(125, y, 6, 24);
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.anisotropy = 4;
+  return tex;
+}
+
+function createGrassTexture(){
+  const c = document.createElement('canvas');
+  c.width = 256; c.height = 256;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#2e6f32';
+  ctx.fillRect(0, 0, 256, 256);
+  for(let i=0; i<5500; i++){
+    const g = 85 + Math.floor(Math.random()*55);
+    const r = 30 + Math.floor(Math.random()*25);
+    const b = 30 + Math.floor(Math.random()*20);
+    ctx.fillStyle = `rgb(${r},${g},${b})`;
+    ctx.fillRect(Math.random()*256, Math.random()*256, 2, 3);
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(60, 60);
+  tex.anisotropy = 4;
+  return tex;
+}
+
+function createBuildingTexture(baseHex, isGlass){
+  const c = document.createElement('canvas');
+  c.width = 128; c.height = 256;
+  const ctx = c.getContext('2d');
+  const col = new THREE.Color(baseHex);
+  ctx.fillStyle = '#' + col.getHexString();
+  ctx.fillRect(0, 0, 128, 256);
+
+  ctx.fillStyle = 'rgba(0,0,0,0.12)';
+  for(let y=0; y<256; y+=16){
+    ctx.fillRect(0, y, 128, 2);
+  }
+
+  const cols = 4, rows = 14;
+  const padX = 10, padY = 6;
+  const winW = (128 - padX*(cols+1)) / cols;
+  const winH = (256 - padY*(rows+1)) / rows;
+  for(let r=0; r<rows; r++){
+    for(let cl=0; cl<cols; cl++){
+      const x = padX + cl*(winW + padX);
+      const y = padY + r*(winH + padY);
+      const lit = Math.random() > 0.65;
+      if(isGlass){
+        ctx.fillStyle = lit ? '#bfe6ff' : '#1e3a5f';
+      } else {
+        ctx.fillStyle = lit ? '#fff3b0' : '#1c2536';
+      }
+      ctx.fillRect(x, y, winW, winH);
+      ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+      ctx.strokeRect(x, y, winW, winH);
+    }
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.anisotropy = 4;
+  return tex;
+}
+
+function addLandmarkLabel(text, x, y, z){
+  const el = document.createElement('div');
+  el.className = 'cityLabel';
+  el.textContent = text;
+  document.body.appendChild(el);
+  landmarks.push({name:text, pos:{x, z}, h:y, labelEl:el});
+}
+
+function buildAlRajhiBank(bx, bz){
+  const bankGroup = new THREE.Group();
+  bankGroup.position.set(bx, 0, bz);
+
+  const bankWallMat = new THREE.MeshStandardMaterial({color:0xe8f5e9, roughness:0.5});
+  const bankGreen = new THREE.MeshStandardMaterial({color:0x1b5e20, roughness:0.4});
+  const goldMat = new THREE.MeshStandardMaterial({color:0xffd700, metalness:0.8, roughness:0.2});
+
+  const body = new THREE.Mesh(new THREE.BoxGeometry(16, 10, 16), bankWallMat);
+  body.position.y = 5;
+  body.castShadow = true; body.receiveShadow = true;
+  bankGroup.add(body);
+
+  const roof = new THREE.Mesh(new THREE.BoxGeometry(17, 1.2, 17), bankGreen);
+  roof.position.y = 10.6;
+  bankGroup.add(roof);
+
+  [-5, 5].forEach(px=>{
+    const col = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 8, 12), goldMat);
+    col.position.set(px, 4, 8.2);
+    bankGroup.add(col);
+  });
+
+  const sign = new THREE.Mesh(new THREE.BoxGeometry(10, 2.2, 0.4), bankGreen);
+  sign.position.set(0, 7.5, 8.2);
+  bankGroup.add(sign);
+
+  const atmBody = new THREE.Mesh(new THREE.BoxGeometry(1.2, 2.2, 1.0), new THREE.MeshStandardMaterial({color:0x333333}));
+  atmBody.position.set(6, 1.1, 8.5);
+  bankGroup.add(atmBody);
+
+  const atmScreen = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.1), new THREE.MeshStandardMaterial({color:0x00ffcc, emissive:0x00aa88}));
+  atmScreen.position.set(6, 1.5, 9.05);
+  bankGroup.add(atmScreen);
+
+  scene.add(bankGroup);
+  buildings.push({mesh:bankGroup, x:bx, z:bz, w:16, h:10, d:16, isBank:true});
+  addLandmarkLabel('🏦 بنك الراجحي', bx, 13, bz);
+}
+
+function buildPalaceAndBots(cx, cz){
+  const palaceGroup = new THREE.Group();
+  palaceGroup.position.set(cx, 0, cz);
+
+  const lawn = new THREE.Mesh(
+    new THREE.BoxGeometry(48, 0.06, 48),
+    new THREE.MeshStandardMaterial({color:0x2ecc71, roughness:0.8})
+  );
+  lawn.position.y = 0.03;
+  lawn.receiveShadow = true;
+  palaceGroup.add(lawn);
+
+  const walkway = new THREE.Mesh(
+    new THREE.BoxGeometry(5, 0.09, 24),
+    new THREE.MeshStandardMaterial({color:0xf5f6fa, roughness:0.4})
+  );
+  walkway.position.set(0, 0.045, 11);
+  walkway.receiveShadow = true;
+  palaceGroup.add(walkway);
+
+  const wallMat = new THREE.MeshStandardMaterial({color:0xfff8e7, roughness:0.4});
+  const goldMat = new THREE.MeshStandardMaterial({color:0xf1c40f, metalness:0.7, roughness:0.25});
+  const roofMat = new THREE.MeshStandardMaterial({color:0xc0392b, roughness:0.5});
+
+  const mainHall = new THREE.Mesh(new THREE.BoxGeometry(18, 9, 13), wallMat);
+  mainHall.position.set(0, 4.5, -5);
+  mainHall.castShadow = true;
+  mainHall.receiveShadow = true;
+  palaceGroup.add(mainHall);
+  buildings.push({mesh:mainHall, x:cx, z:cz-5, w:18, h:9, d:13});
+
+  const upperHall = new THREE.Mesh(new THREE.BoxGeometry(12, 5.5, 10), wallMat);
+  upperHall.position.set(0, 11.75, -5);
+  upperHall.castShadow = true;
+  palaceGroup.add(upperHall);
+
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(3.6, 20, 16, 0, Math.PI*2, 0, Math.PI/2), goldMat);
+  dome.position.set(0, 14.5, -5);
+  palaceGroup.add(dome);
+
+  [-11.5, 11.5].forEach(wx=>{
+    const wing = new THREE.Mesh(new THREE.BoxGeometry(6, 7.5, 10), wallMat);
+    wing.position.set(wx, 3.75, -4);
+    wing.castShadow = true;
+    palaceGroup.add(wing);
+    buildings.push({mesh:wing, x:cx+wx, z:cz-4, w:6, h:7.5, d:10});
+
+    const towerTop = new THREE.Mesh(new THREE.ConeGeometry(4.3, 4, 8), roofMat);
+    towerTop.position.set(wx, 9.5, -4);
+    palaceGroup.add(towerTop);
+  });
+
+  [-2.6, 2.6].forEach(px=>{
+    const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.55, 8.5, 12), goldMat);
+    pillar.position.set(px, 4.25, 2.2);
+    palaceGroup.add(pillar);
+  });
+  const door = new THREE.Mesh(new THREE.BoxGeometry(3.4, 5.2, 0.4), new THREE.MeshStandardMaterial({color:0x6e2c00}));
+  door.position.set(0, 2.6, 1.6);
+  palaceGroup.add(door);
+
+  const flowerColors = [0xff3366, 0xffcc00, 0x9b59b6, 0xff6b81, 0x00d2d3, 0xff9ff3];
+  for(let i=0; i<36; i++){
+    const side = (i % 2 === 0) ? -1 : 1;
+    const fx = side * (4 + (i % 6) * 3.1);
+    const fz = 2 + Math.floor(i / 6) * 3.2;
+
+    const stem = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.06, 0.06, 0.5, 6),
+      new THREE.MeshStandardMaterial({color:0x1e8449})
+    );
+    stem.position.set(fx, 0.28, fz);
+    palaceGroup.add(stem);
+
+    const blossom = new THREE.Mesh(
+      new THREE.SphereGeometry(0.28, 8, 8),
+      new THREE.MeshStandardMaterial({color: flowerColors[i % flowerColors.length], emissive: flowerColors[i % flowerColors.length], emissiveIntensity:0.15})
+    );
+    blossom.position.set(fx, 0.58, fz);
+    palaceGroup.add(blossom);
+  }
+
+  scene.add(palaceGroup);
+  addLandmarkLabel('🏰 القصر الملكي', cx, 18.5, cz-5);
+
+  const botConfigs = [
+    {shirt:0xe74c3c, pants:0x2c3e50, hair:0x111111, startX:-8, startZ:8, dirX:1, dirZ:0, minX:-16, maxX:16, minZ:4, maxZ:19},
+    {shirt:0x3498db, pants:0x1a252f, hair:0x3d2314, startX:10, startZ:14, dirX:0, dirZ:-1, minX:-16, maxX:16, minZ:4, maxZ:19},
+    {shirt:0xf1c40f, pants:0x34495e, hair:0x222222, startX:-12, startZ:17, dirX:0.7, dirZ:-0.7, minX:-18, maxX:18, minZ:4, maxZ:20},
+    {shirt:0x9b59b6, pants:0x2c3e50, hair:0x000000, startX:6, startZ:6, dirX:-1, dirZ:0.3, minX:-16, maxX:16, minZ:4, maxZ:19}
+  ];
+
+  botConfigs.forEach(cfg=>{
+    const bot = makeHumanoidBot(cfg.shirt, cfg.pants, cfg.hair);
+    bot.group.position.set(cx + cfg.startX, 0, cz + cfg.startZ);
+    scene.add(bot.group);
+    npcs.push({
+      ...bot,
+      vx: cfg.dirX,
+      vz: cfg.dirZ,
+      bounds: {
+        minX: cx + cfg.minX,
+        maxX: cx + cfg.maxX,
+        minZ: cz + cfg.minZ,
+        maxZ: cz + cfg.maxZ
+      },
+      walkTime: Math.random() * 10
+    });
+  });
+}
+
+function makeHumanoidBot(shirtHex, pantsHex, hairHex){
+  const group = new THREE.Group();
+  const skinMat = new THREE.MeshStandardMaterial({color:0xe0a978});
+  const sMat = new THREE.MeshStandardMaterial({color:shirtHex});
+  const pMat = new THREE.MeshStandardMaterial({color:pantsHex});
+  const hMat = new THREE.MeshStandardMaterial({color:hairHex});
+
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.26,10,10), skinMat);
+  head.position.y = 1.68; head.castShadow = true; group.add(head);
+
+  const hair = new THREE.Mesh(new THREE.SphereGeometry(0.27,10,10,0,Math.PI*2,0,Math.PI/1.7), hMat);
+  hair.position.y = 1.74; group.add(hair);
+
+  const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.26,0.72,8), sMat);
+  torso.position.y = 1.18; torso.castShadow = true; group.add(torso);
+
+  const legL = new THREE.Mesh(new THREE.CylinderGeometry(0.11,0.1,0.68,6), pMat);
+  legL.position.set(-0.13,0.34,0); legL.castShadow = true; group.add(legL);
+
+  const legR = new THREE.Mesh(new THREE.CylinderGeometry(0.11,0.1,0.68,6), pMat);
+  legR.position.set(0.13,0.34,0); legR.castShadow = true; group.add(legR);
+
+  const armL = new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,0.52,6), skinMat);
+  armL.position.set(-0.39,1.18,0); armL.rotation.z = 0.12; group.add(armL);
+
+  const armR = new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,0.52,6), skinMat);
+  armR.position.set(0.39,1.18,0); armR.rotation.z = -0.12; group.add(armR);
+
+  return {group, legL, legR, armL, armR};
+}
+
+function triggerCrimeWanted(reasonText){
+  const wasWanted = isWanted;
+  isWanted = true;
+  updateLocationButtons();
+  if(!wasWanted){
+    toast(reasonText || '🚨 قتلت بوتاً! الشرطة تطاردك، اهرب إلى بيتك!');
+  }
+  const pp = playerPos();
+  let alerted = 0;
+  policeCars.forEach(pc=>{
+    if(pc === inCar) return;
+    pc.task = { robbery: true, chase: true, t: 0 };
+    pc.sirenOn = true;
+    pc.parked = false;
+    alerted++;
+  });
+  const nearest = policeCars.reduce((best, c)=>{
+    if(c===inCar) return best;
+    const d = Math.hypot(c.group.position.x - pp.x, c.group.position.z - pp.z);
+    return (!best || d < best.d) ? {c, d} : best;
+  }, null);
+  if(nearest && nearest.d > 75){
+    const ang = Math.random()*Math.PI*2;
+    nearest.c.group.position.set(pp.x + Math.cos(ang)*42, 0.4, pp.z + Math.sin(ang)*42);
+  }
+}
+
+function killBot(bot, impactDir, byCar){
+  if(bot.dead) return;
+  bot.dead = true;
+  bot.hp = 0;
+  bot.deathTimer = 0;
+  bot.deathVelY = byCar ? 5.5 : 3.2;
+  bot.deathPushX = impactDir ? impactDir.x * (byCar ? 7 : 3) : 0;
+  bot.deathPushZ = impactDir ? impactDir.z * (byCar ? 7 : 3) : 0;
+  bot.fallSide = Math.random() < 0.5 ? 1 : -1;
+  spawnSmoke(bot.group.position.clone().setY(1.0));
+  triggerCrimeWanted(byCar ? '🚨 دهست بوتاً! الشرطة تطاردك، اهرب إلى بيتك!' : '🚨 قتلت بوتاً! الشرطة تطاردك، اهرب إلى بيتك!');
+}
+
+function animateBotDeath(bot, dt){
+  bot.deathTimer += dt;
+  if(bot.deathTimer < 0.65){
+    bot.group.position.x += bot.deathPushX * dt;
+    bot.group.position.z += bot.deathPushZ * dt;
+    bot.deathVelY -= 16 * dt;
+    bot.group.position.y = Math.max(0.22, bot.group.position.y + bot.deathVelY * dt);
+    const p = Math.min(1, bot.deathTimer / 0.45);
+    bot.group.rotation.z = bot.fallSide * (Math.PI / 2) * p;
+    bot.group.rotation.x = 0.35 * p;
+    bot.armL.rotation.z = 1.1 * p;
+    bot.armR.rotation.z = -1.1 * p;
+    bot.legL.rotation.x = 0.4 * p;
+    bot.legR.rotation.x = -0.35 * p;
+  } else {
+    bot.group.position.y = 0.22;
+    bot.group.rotation.z = bot.fallSide * (Math.PI / 2);
+  }
+  if(bot.deathTimer > 5.0){
+    bot.dead = false;
+    bot.hp = 5;
+    bot.deathTimer = 0;
+    bot.group.rotation.set(0, 0, 0);
+    bot.group.position.y = 0;
+    bot.armL.rotation.set(0, 0, 0.12);
+    bot.armR.rotation.set(0, 0, -0.12);
+    bot.legL.rotation.set(0, 0, 0);
+    bot.legR.rotation.set(0, 0, 0);
+    if(bot.bounds){
+      bot.group.position.x = bot.bounds.minX + Math.random()*(bot.bounds.maxX - bot.bounds.minX);
+      bot.group.position.z = bot.bounds.minZ + Math.random()*(bot.bounds.maxZ - bot.bounds.minZ);
+    }
+  }
+}
+
+function updateNPCs(dt){
+  npcs.forEach(bot=>{
+    if(bot.hp === undefined) bot.hp = 5;
+    if(bot.dead){
+      animateBotDeath(bot, dt);
+      return;
+    }
+    if(bot.hitFlash > 0){
+      bot.hitFlash -= dt;
+      bot.group.scale.set(1.08, 0.94, 1.08);
+    } else {
+      bot.group.scale.set(1, 1, 1);
+    }
+
+    if(inCar && Math.abs(inCar.speed || 0) > 0.08){
+      const dCar = Math.hypot(inCar.group.position.x - bot.group.position.x, inCar.group.position.z - bot.group.position.z);
+      if(dCar < 2.2){
+        const cDir = new THREE.Vector3(Math.sin(inCar.group.rotation.y), 0, Math.cos(inCar.group.rotation.y));
+        killBot(bot, cDir, true);
+        return;
+      }
+    }
+
+    bot.walkTime += dt * 7;
+    const speed = 2.1 * dt;
+    bot.group.position.x += bot.vx * speed;
+    bot.group.position.z += bot.vz * speed;
+
+    if(bot.group.position.x < bot.bounds.minX){ bot.group.position.x = bot.bounds.minX; bot.vx = Math.abs(bot.vx); }
+    if(bot.group.position.x > bot.bounds.maxX){ bot.group.position.x = bot.bounds.maxX; bot.vx = -Math.abs(bot.vx); }
+    if(bot.group.position.z < bot.bounds.minZ){ bot.group.position.z = bot.bounds.minZ; bot.vz = Math.abs(bot.vz); }
+    if(bot.group.position.z > bot.bounds.maxZ){ bot.group.position.z = bot.bounds.maxZ; bot.vz = -Math.abs(bot.vz); }
+
+    bot.group.rotation.y = Math.atan2(bot.vx, bot.vz);
+    const swing = Math.sin(bot.walkTime);
+    bot.legL.rotation.x = swing * 0.55;
+    bot.legR.rotation.x = -swing * 0.55;
+    bot.armL.rotation.x = -swing * 0.4;
+    bot.armR.rotation.x = swing * 0.4;
+  });
+}
+
+function buildBurjKhalifa(bx, bz){
+  const burjGroup = new THREE.Group();
+  burjGroup.position.set(bx, 0, bz);
+
+  const burjTex = createBuildingTexture(0x3b82f6, true);
+  burjTex.repeat.set(2, 4);
+  const glassMat = new THREE.MeshStandardMaterial({
+    map: burjTex,
+    color: 0x93c5fd,
+    metalness: 0.88,
+    roughness: 0.12
+  });
+  const silverMat = new THREE.MeshStandardMaterial({
+    color: 0xdff9fb,
+    metalness: 0.9,
+    roughness: 0.2
+  });
+
+  const tiers = [
+    {w:14, h:18, d:14, y:9},
+    {w:11, h:22, d:11, y:29},
+    {w:8.5, h:24, d:8.5, y:52},
+    {w:6, h:24, d:6, y:76},
+    {w:3.8, h:22, d:3.8, y:99},
+    {w:2, h:18, d:2, y:119}
+  ];
+
+  tiers.forEach((t, idx)=>{
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(t.w, t.h, t.d), idx % 2 === 0 ? glassMat : silverMat);
+    mesh.position.y = t.y;
+    mesh.castShadow = true;
+    burjGroup.add(mesh);
+  });
+
+  const spire = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.9, 26, 8), silverMat);
+  spire.position.y = 141;
+  burjGroup.add(spire);
+
+  const plaza = new THREE.Mesh(
+    new THREE.BoxGeometry(24, 0.08, 24),
+    new THREE.MeshStandardMaterial({color:0xdfe6e9})
+  );
+  plaza.position.set(0, 0.04, 4);
+  burjGroup.add(plaza);
+
+  scene.add(burjGroup);
+  buildings.push({mesh:burjGroup, x:bx, z:bz, w:14, h:150, d:14});
+  addLandmarkLabel('🏙️ برج خليفة (شقة 50,000 ريال)', bx, 156, bz);
+}
+
+function buildSmallApartmentBuilding(ax, az){
+  const aptGroup = new THREE.Group();
+  aptGroup.position.set(ax, 0, az);
+
+  const wallMat = new THREE.MeshStandardMaterial({color:0xf3a683, roughness:0.6});
+  const roofMat = new THREE.MeshStandardMaterial({color:0x596275, roughness:0.5});
+  const doorMat = new THREE.MeshStandardMaterial({color:0x303952});
+
+  const body = new THREE.Mesh(new THREE.BoxGeometry(9, 7, 8), wallMat);
+  body.position.y = 3.5;
+  body.castShadow = true;
+  aptGroup.add(body);
+
+  const roof = new THREE.Mesh(new THREE.BoxGeometry(9.6, 0.6, 8.6), roofMat);
+  roof.position.y = 7.3;
+  aptGroup.add(roof);
+
+  const door = new THREE.Mesh(new THREE.BoxGeometry(1.8, 3.2, 0.3), doorMat);
+  door.position.set(0, 1.6, 4.05);
+  aptGroup.add(door);
+
+  scene.add(aptGroup);
+  buildings.push({mesh:aptGroup, x:ax, z:az, w:9, h:7, d:8});
+  addLandmarkLabel('🏢 الشقة الصغيرة (50 ريال)', ax, 8.8, az);
+}
+
+function init(){
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x9bd2f5);
+  scene.fog = new THREE.FogExp2(0xb8ddf5, 0.0032);
+
+  camera = new THREE.PerspectiveCamera(65, innerWidth/innerHeight, 0.1, 1000);
+  scene.add(camera);
+
+  dashboardGroup = new THREE.Group();
+  dashboardGroup.visible = false;
+  camera.add(dashboardGroup);
+  const dashMat = new THREE.MeshStandardMaterial({color:0x1b1f24, roughness:0.55, metalness:0.3});
+  const dashTrim = new THREE.MeshStandardMaterial({color:0x2e343b, roughness:0.4, metalness:0.5});
+  const wheelRimMat = new THREE.MeshStandardMaterial({color:0x14171a, roughness:0.7});
+  const wheelCenterMat = new THREE.MeshStandardMaterial({color:0x555b63, metalness:0.8, roughness:0.25});
+  const gaugeMat = new THREE.MeshStandardMaterial({color:0x0a0c0e, emissive:0x1a3a1a, emissiveIntensity:0.6});
+
+  const dash = new THREE.Mesh(new THREE.BoxGeometry(0.95,0.22,0.3), dashMat);
+  dash.position.set(0,-0.33,-0.55);
+  dash.rotation.x = -0.25;
+  dashboardGroup.add(dash);
+  const dashTop = new THREE.Mesh(new THREE.BoxGeometry(0.95,0.05,0.1), dashTrim);
+  dashTop.position.set(0,-0.23,-0.68);
+  dashboardGroup.add(dashTop);
+
+  const gauge = new THREE.Mesh(new THREE.CylinderGeometry(0.075,0.075,0.02,20), gaugeMat);
+  gauge.rotation.x = Math.PI/2 - 0.25;
+  gauge.position.set(-0.22,-0.28,-0.5);
+  dashboardGroup.add(gauge);
+
+  steeringWheelGroup = new THREE.Group();
+  steeringWheelGroup.position.set(-0.26,-0.26,-0.42);
+  steeringWheelGroup.rotation.x = -0.55;
+  dashboardGroup.add(steeringWheelGroup);
+
+  const wheelRim = new THREE.Mesh(new THREE.TorusGeometry(0.17,0.022,10,24), wheelRimMat);
+  steeringWheelGroup.add(wheelRim);
+  const wheelHub = new THREE.Mesh(new THREE.CylinderGeometry(0.045,0.045,0.05,16), wheelCenterMat);
+  wheelHub.rotation.x = Math.PI/2;
+  steeringWheelGroup.add(wheelHub);
+  [0,2.1,4.2].forEach(ang=>{
+    const spoke = new THREE.Mesh(new THREE.BoxGeometry(0.03,0.14,0.02), wheelCenterMat);
+    spoke.position.set(Math.sin(ang)*0.1, Math.cos(ang)*0.1, 0);
+    spoke.rotation.z = ang;
+    steeringWheelGroup.add(spoke);
+  });
+
+  renderer = new THREE.WebGLRenderer({antialias:true, powerPreference:'high-performance'});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.08;
+  document.body.appendChild(renderer.domElement);
+
+  renderer.domElement.addEventListener('pointerdown', e=>{
+    if(e.pointerType === 'touch' || e.pointerType === 'mouse'){
+      camDragging = true;
+      camPointerId = e.pointerId;
+      camLastX = e.clientX;
+      camLastY = e.clientY;
+      try{ renderer.domElement.setPointerCapture(e.pointerId); }catch(_){}
+    }
+  });
+  renderer.domElement.addEventListener('pointermove', e=>{
+    if(!camDragging || e.pointerId !== camPointerId) return;
+    const dx = e.clientX - camLastX;
+    const dy = e.clientY - camLastY;
+    camLastX = e.clientX;
+    camLastY = e.clientY;
+    camYaw -= dx * camSensitivity;
+    camPitch -= dy * camSensitivity;
+    const maxPitch = 1.15;
+    const minPitch = -0.15;
+    camPitch = Math.max(minPitch, Math.min(maxPitch, camPitch));
+  });
+  const endCameraDrag = e=>{
+    if(e.pointerId === camPointerId){
+      camDragging = false;
+      camPointerId = null;
+      try{ renderer.domElement.releasePointerCapture(e.pointerId); }catch(_){}
+    }
+  };
+  renderer.domElement.addEventListener('pointerup', endCameraDrag);
+  renderer.domElement.addEventListener('pointercancel', endCameraDrag);
+
+  const hemi = new THREE.HemisphereLight(0xdff2ff, 0x3b4d2b, 0.85);
+  scene.add(hemi);
+  const sun = new THREE.DirectionalLight(0xfff4dc, 1.35);
+  sun.position.set(85, 130, 55);
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.bias = -0.0005;
+  sun.shadow.camera.near = 10;
+  sun.shadow.camera.far = 420;
+  sun.shadow.camera.left=-180; sun.shadow.camera.right=180;
+  sun.shadow.camera.top=180; sun.shadow.camera.bottom=-180;
+  scene.add(sun);
+
+  const sunDisc = new THREE.Mesh(
+    new THREE.SphereGeometry(12, 16, 16),
+    new THREE.MeshBasicMaterial({color:0xfff9d6})
+  );
+  sunDisc.position.set(220, 320, 140);
+  scene.add(sunDisc);
+
+  const cloudMat = new THREE.MeshStandardMaterial({color:0xffffff, roughness:0.95, transparent:true, opacity:0.88});
+  for(let c=0; c<18; c++){
+    const cloud = new THREE.Group();
+    const parts = 3 + Math.floor(Math.random()*3);
+    for(let p=0; p<parts; p++){
+      const puff = new THREE.Mesh(new THREE.SphereGeometry(5+Math.random()*5, 10, 8), cloudMat);
+      puff.position.set(p*5 - 6, Math.random()*2, (Math.random()-0.5)*4);
+      puff.scale.y = 0.55;
+      cloud.add(puff);
+    }
+    cloud.position.set((Math.random()-0.5)*460, 85 + Math.random()*35, (Math.random()-0.5)*460);
+    scene.add(cloud);
+  }
+
+  const grassTex = createGrassTexture();
+  const groundGeo = new THREE.PlaneGeometry(600,600);
+  const groundMat = new THREE.MeshStandardMaterial({map: grassTex, roughness:0.92, metalness:0.02});
+  const ground = new THREE.Mesh(groundGeo, groundMat);
+  ground.rotation.x = -Math.PI/2;
+  ground.receiveShadow = true;
+  scene.add(ground);
+
+  const roadTex1 = createAsphaltTexture();
+  roadTex1.repeat.set(1, 35);
+  const roadMat1 = new THREE.MeshStandardMaterial({map: roadTex1, roughness:0.85, metalness:0.08});
+
+  const roadTex2 = createAsphaltTexture();
+  roadTex2.repeat.set(1, 35);
+  const roadMat2 = new THREE.MeshStandardMaterial({map: roadTex2, roughness:0.85, metalness:0.08});
+
+  const sidewalkMat = new THREE.MeshStandardMaterial({color:0x9ca3af, roughness:0.85});
+  const sw1 = new THREE.Mesh(new THREE.BoxGeometry(600, 0.14, 18), sidewalkMat);
+  sw1.position.y = 0.05; sw1.receiveShadow = true; scene.add(sw1);
+  const sw2 = new THREE.Mesh(new THREE.BoxGeometry(18, 0.14, 600), sidewalkMat);
+  sw2.position.y = 0.05; sw2.receiveShadow = true; scene.add(sw2);
+
+  const road1 = new THREE.Mesh(new THREE.PlaneGeometry(14, 600), roadMat1);
+  road1.rotation.x = -Math.PI/2;
+  road1.rotation.z = Math.PI/2;
+  road1.position.y = 0.13;
+  road1.receiveShadow = true;
+  scene.add(road1);
+
+  const road2 = new THREE.Mesh(new THREE.PlaneGeometry(14, 600), roadMat2);
+  road2.rotation.x = -Math.PI/2;
+  road2.position.y = 0.13;
+  road2.receiveShadow = true;
+  scene.add(road2);
+
+  buildAlRajhiBank(45, 45);
+
+  const poleMat = new THREE.MeshStandardMaterial({color:0x374151, metalness:0.7, roughness:0.3});
+  const bulbMat = new THREE.MeshStandardMaterial({color:0xfffbeb, emissive:0xfde68a, emissiveIntensity:0.9});
+  const trunkMat = new THREE.MeshStandardMaterial({color:0x5c3a21, roughness:0.9});
+  const leafMat = new THREE.MeshStandardMaterial({color:0x236b2c, roughness:0.8});
+
+  for(let pos=-220; pos<=220; pos+=36){
+    if(Math.abs(pos) < 16) continue;
+    [[-8.3, pos], [8.3, pos], [pos, -8.3], [pos, 8.3]].forEach(([lx, lz], idx)=>{
+      if(idx % 2 === 0){
+        const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.13, 5.5, 8), poleMat);
+        pole.position.set(lx, 2.75, lz);
+        pole.castShadow = true;
+        scene.add(pole);
+        const lamp = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.14, 0.25), bulbMat);
+        lamp.position.set(lx, 5.5, lz);
+        scene.add(lamp);
+      } else {
+        const tree = new THREE.Group();
+        const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.34, 2.6, 8), trunkMat);
+        trunk.position.y = 1.3; trunk.castShadow = true; tree.add(trunk);
+        const crown1 = new THREE.Mesh(new THREE.DodecahedronGeometry(1.45, 1), leafMat);
+        crown1.position.y = 3.2; crown1.castShadow = true; tree.add(crown1);
+        const crown2 = new THREE.Mesh(new THREE.DodecahedronGeometry(1.05, 1), leafMat);
+        crown2.position.set(0.5, 4.1, 0.3); crown2.castShadow = true; tree.add(crown2);
+        tree.position.set(lx + (lx>0?2.5:-2.5), 0, lz + (lz>0?2.5:-2.5));
+        scene.add(tree);
+      }
+    });
+  }
+
+  buildPalaceAndBots(-180, 140);
+  buildBurjKhalifa(185, -162);
+  buildSmallApartmentBuilding(165, 142);
+
+  const buildingColors = [0xcccccc,0xaa8866,0x8899aa,0xddbb88,0x999999];
+  for(let i=0;i<24;i++){
+    let x = (Math.random()>0.5?1:-1)*(20+Math.random()*120);
+    let z = (Math.random()>0.5?1:-1)*(20+Math.random()*120);
+    if(Math.abs(x)<12 || Math.abs(z)<12) continue;
+    const h = 8+Math.random()*30;
+    const w = 6+Math.random()*10;
+    const geo = new THREE.BoxGeometry(w,h,w);
+    const bTex = createBuildingTexture(buildingColors[i%buildingColors.length], i%3===0);
+    const mat = new THREE.MeshStandardMaterial({map: bTex, roughness: i%3===0 ? 0.25 : 0.65, metalness: i%3===0 ? 0.45 : 0.1});
+    const b = new THREE.Mesh(geo, mat);
+    b.position.set(x, h/2, z);
+    b.castShadow = true; b.receiveShadow = true;
+    scene.add(b);
+    buildings.push({mesh:b, x, z, w, h, d:w});
+  }
+
+  const landmarkDefs = [
+    {name:'👮 مركز شرطة', color:0x1565c0, x:-35, z:35, h:14, w:12},
+    {name:'🚓 الدفاع المدني', color:0xd32f2f, x:35, z:-35, h:12, w:12},
+    {name:'🚦 نقطة مرور', color:0xf9a825, x:-35, z:-35, h:8, w:9},
+    {name:'🏛️ مبنى الإمارة', color:0x6a1b9a, x:0, z:60, h:22, w:16}
+  ];
+  landmarkDefs.forEach(def=>{
+    const geo = new THREE.BoxGeometry(def.w, def.h, def.w);
+    const lTex = createBuildingTexture(def.color, false);
+    const mat = new THREE.MeshStandardMaterial({map: lTex, roughness:0.45, metalness:0.2});
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(def.x, def.h/2, def.z);
+    mesh.castShadow = true; mesh.receiveShadow = true;
+    scene.add(mesh);
+    buildings.push({mesh, x:def.x, z:def.z, w:def.w, h:def.h, d:def.w});
+    addLandmarkLabel(def.name, def.x, def.h+1.5, def.z);
+  });
+
+  const carColors = [0xff4444,0x4444ff,0xffff44,0x44ff44,0xff8800, 'bmw', 'lambo', 'toyota'];
+  for(let i=0;i<10;i++){
+    const carType = carColors[i%carColors.length];
+    const car = makeCar(carType);
+    let x = (Math.random()-0.5)*260;
+    let z = (Math.random()-0.5)*260;
+    car.group.position.set(x,0.4,z);
+    car.group.rotation.y = Math.random()*Math.PI*2;
+    car.isAiCar = true;
+    car.aiSpeed = 0.08 + Math.random()*0.12;
+    car.aiTimer = Math.random()*100;
+    scene.add(car.group);
+    cars.push(car);
+  }
+
+  for(let i=0; i<18; i++){
+    const shirtCol = [0xe74c3c, 0x3498db, 0xf1c40f, 0x9b59b6, 0x2ecc71][i%5];
+    const pantsCol = [0x2c3e50, 0x1a252f, 0x34495e][i%3];
+    const bot = makeHumanoidBot(shirtCol, pantsCol, 0x111111);
+    const bx = (Math.random()-0.5)*300;
+    const bz = (Math.random()-0.5)*300;
+    bot.group.position.set(bx, 0, bz);
+    scene.add(bot.group);
+    npcs.push({
+      ...bot,
+      vx: (Math.random()-0.5)*1.5,
+      vz: (Math.random()-0.5)*1.5,
+      bounds: {minX:-280, maxX:280, minZ:-280, maxZ:280},
+      walkTime: Math.random()*10
+    });
+  }
+
+  showCar = makeCar('toyota');
+  showCar.group.position.set(8,0.4,25);
+  showCar.center = new THREE.Vector3(8,0.4,25);
+  showCar.angle = 0;
+  scene.add(showCar.group);
+
+  player = new THREE.Group();
+  const skinMat = new THREE.MeshStandardMaterial({color:0xe0a978});
+  shirtMat = new THREE.MeshStandardMaterial({color:0x2d4a6b});
+  pantsMat = new THREE.MeshStandardMaterial({color:0x33363d});
+  hairMat = new THREE.MeshStandardMaterial({color:0x2a1a12});
+  const gunMat = new THREE.MeshStandardMaterial({color:0x222222});
+  const eyeMat = new THREE.MeshStandardMaterial({color:0x111111});
+
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.28,10,10), skinMat);
+  head.position.y = 1.72; head.castShadow = true; player.add(head);
+
+  const hair = new THREE.Mesh(new THREE.SphereGeometry(0.29,10,10,0,Math.PI*2,0,Math.PI/1.7), hairMat);
+  hair.position.y = 1.78; player.add(hair);
+
+  const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.03,6,6), eyeMat);
+  eyeL.position.set(-0.1,1.74,0.25); player.add(eyeL);
+  const eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.03,6,6), eyeMat);
+  eyeR.position.set(0.1,1.74,0.25); player.add(eyeR);
+
+  const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.32,0.28,0.75,8), shirtMat);
+  torso.position.y = 1.2; torso.castShadow = true; player.add(torso);
+  playerBody = torso;
+
+  const hip = new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.28,0.25,8), pantsMat);
+  hip.position.y = 0.7; hip.castShadow = true; player.add(hip);
+
+  function limb(mat, len, rad){
+    const m = new THREE.Mesh(new THREE.CylinderGeometry(rad,rad*0.9,len,6), mat);
+    m.castShadow = true; return m;
+  }
+  const shoeMat = new THREE.MeshStandardMaterial({color:0x111827, roughness:0.6});
+  const legL = limb(pantsMat,0.7,0.12); legL.position.set(-0.14,0.35,0); player.add(legL);
+  const shoeL = new THREE.Mesh(new THREE.BoxGeometry(0.18,0.1,0.3), shoeMat); shoeL.position.set(0,-0.33,0.05); legL.add(shoeL);
+  const legR = limb(pantsMat,0.7,0.12); legR.position.set(0.14,0.35,0); player.add(legR);
+  const shoeR = new THREE.Mesh(new THREE.BoxGeometry(0.18,0.1,0.3), shoeMat); shoeR.position.set(0,-0.33,0.05); legR.add(shoeR);
+  const armL = limb(skinMat,0.55,0.09); armL.position.set(-0.42,1.2,0); armL.rotation.z=0.15; player.add(armL);
+  player.legL = legL; player.legR = legR; player.armL = armL;
+
+  const armMat = skinMat;
+  const leftArmGroup = new THREE.Group();
+  leftArmGroup.position.set(-0.42, 1.35, 0);
+  const armLMesh = limb(armMat, 0.52, 0.085);
+  armLMesh.position.set(0, -0.26, 0);
+  leftArmGroup.add(armLMesh);
+  const handL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.14, 0.14), armMat);
+  handL.position.set(0, -0.54, 0.02);
+  const fingersL = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.06, 0.12), armMat);
+  fingersL.position.set(0, -0.06, 0.08);
+  handL.add(fingersL);
+  leftArmGroup.add(handL);
+  player.add(leftArmGroup);
+  player.armL = leftArmGroup;
+
+  const rightArmGroup = new THREE.Group();
+  rightArmGroup.position.set(0.42, 1.35, 0.05);
+  rightArmGroup.rotation.x = -0.8;
+  const armRMesh = limb(armMat, 0.52, 0.085);
+  armRMesh.position.set(0, -0.26, 0);
+  rightArmGroup.add(armRMesh);
+  const handR = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.14, 0.14), armMat);
+  handR.position.set(0, -0.54, 0.02);
+  const fingersR = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.06, 0.12), armMat);
+  fingersR.position.set(0, -0.06, 0.08);
+  handR.add(fingersR);
+  rightArmGroup.add(rightArmGroup);
+  player.add(rightArmGroup);
+  playerArm = rightArmGroup;
+  player.runTime = 0;
+
+  const chromeMat = new THREE.MeshStandardMaterial({color:0xb0bec5, metalness:0.85, roughness:0.2});
+  const darkMetal = new THREE.MeshStandardMaterial({color:0x1c1f24, metalness:0.75, roughness:0.3});
+  const goldGunMat = new THREE.MeshStandardMaterial({color:0xffd700, metalness:0.9, roughness:0.15, emissive:0x332200});
+  const neonCyanMat = new THREE.MeshStandardMaterial({color:0x00ffff, emissive:0x00bcd4, emissiveIntensity:0.9, metalness:0.8});
+  const woodStockMat = new THREE.MeshStandardMaterial({color:0x5d4037, roughness:0.65});
+
+  const pistol = new THREE.Group();
+  const pSlide = new THREE.Mesh(new THREE.BoxGeometry(0.09,0.11,0.44), chromeMat);
+  pSlide.position.set(0,0.02,0.05); pistol.add(pSlide);
+  const pLower = new THREE.Mesh(new THREE.BoxGeometry(0.08,0.05,0.4), darkMetal);
+  pLower.position.set(0,-0.04,0.04); pistol.add(pLower);
+  const pBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.022,0.022,0.12,10), darkMetal);
+  pBarrel.rotation.x = Math.PI/2; pBarrel.position.set(0,0.02,0.3); pistol.add(pBarrel);
+  const pGrip = new THREE.Mesh(new THREE.BoxGeometry(0.075,0.22,0.1), darkMetal);
+  pGrip.position.set(0,-0.14,-0.04); pGrip.rotation.x = 0.2; pistol.add(pGrip);
+  const pSight = new THREE.Mesh(new THREE.BoxGeometry(0.02,0.03,0.03), neonCyanMat);
+  pSight.position.set(0,0.085,0.22); pistol.add(pSight);
+  pistol.position.set(0,-0.5,0.12);
+  rightArmGroup.add(pistol);
+
+  const rifle = new THREE.Group();
+  const rBody = new THREE.Mesh(new THREE.BoxGeometry(0.09,0.11,0.85), darkMetal);
+  rifle.add(rBody);
+  const rStock = new THREE.Mesh(new THREE.BoxGeometry(0.08,0.14,0.32), woodStockMat);
+  rStock.position.set(0,-0.02,-0.5); rifle.add(rStock);
+  const rBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.02,0.025,0.45,10), chromeMat);
+  rBarrel.rotation.x = Math.PI/2; rBarrel.position.set(0,0.02,0.6); rifle.add(rBarrel);
+  const rScope = new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.035,0.36,12), darkMetal);
+  rScope.rotation.x = Math.PI/2; rScope.position.set(0,0.11,0.05); rifle.add(rScope);
+  const rLens = new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.02,12), neonCyanMat);
+  rLens.rotation.x = Math.PI/2; rLens.position.set(0,0.11,0.23); rifle.add(rLens);
+  const rGrip = new THREE.Mesh(new THREE.BoxGeometry(0.07,0.2,0.08), darkMetal);
+  rGrip.position.set(0,-0.13,-0.15); rifle.add(rGrip);
+  const rMag = new THREE.Mesh(new THREE.BoxGeometry(0.06,0.24,0.09), chromeMat);
+  rMag.position.set(0,-0.16,0.12); rMag.rotation.x = -0.15; rifle.add(rMag);
+  rifle.position.set(0,-0.5,0.15);
+  rifle.visible = false;
+  rightArmGroup.add(rifle);
+
+  const smg1000 = new THREE.Group();
+  const sBody = new THREE.Mesh(new THREE.BoxGeometry(0.11,0.14,0.68), darkMetal);
+  smg1000.add(sBody);
+  const sTopRail = new THREE.Mesh(new THREE.BoxGeometry(0.07,0.03,0.62), goldGunMat);
+  sTopRail.position.set(0,0.085,0.02); smg1000.add(sTopRail);
+  const sSilencer = new THREE.Mesh(new THREE.CylinderGeometry(0.038,0.038,0.28,12), chromeMat);
+  sSilencer.rotation.x = Math.PI/2; sSilencer.position.set(0,0.01,0.46); smg1000.add(sSilencer);
+  const sHolo = new THREE.Mesh(new THREE.BoxGeometry(0.07,0.07,0.12), darkMetal);
+  sHolo.position.set(0,0.13,0.02); smg1000.add(sHolo);
+  const sGrip = new THREE.Mesh(new THREE.BoxGeometry(0.075,0.21,0.08), darkMetal);
+  sGrip.position.set(0,-0.14,-0.12); smg1000.add(sGrip);
+  const sDrum = new THREE.Mesh(new THREE.CylinderGeometry(0.11,0.11,0.09,14), goldGunMat);
+  sDrum.rotation.z = Math.PI/2; sDrum.position.set(0,-0.14,0.12); smg1000.add(sDrum);
+  smg1000.position.set(0,-0.5,0.15);
+  smg1000.visible = false;
+  rightArmGroup.add(smg1000);
+
+  const burst1200 = new THREE.Group();
+  const bBody = new THREE.Mesh(new THREE.BoxGeometry(0.12,0.15,0.78), new THREE.MeshStandardMaterial({color:0x2e4053, metalness:0.8, roughness:0.25}));
+  burst1200.add(bBody);
+  const bHandguard = new THREE.Mesh(new THREE.BoxGeometry(0.13,0.13,0.38), chromeMat);
+  bHandguard.position.set(0,0.01,0.28); burst1200.add(bHandguard);
+  const bBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.026,0.026,0.25,10), darkMetal);
+  bBarrel.rotation.x = Math.PI/2; bBarrel.position.set(0,0.02,0.56); burst1200.add(bBarrel);
+  const bMag = new THREE.Mesh(new THREE.BoxGeometry(0.07,0.3,0.11), new THREE.MeshStandardMaterial({color:0xe67e22, metalness:0.6}));
+  bMag.position.set(0,-0.19,0.14); bMag.rotation.x = -0.22; burst1200.add(bMag);
+  const bGrip = new THREE.Mesh(new THREE.BoxGeometry(0.075,0.21,0.08), darkMetal);
+  bGrip.position.set(0,-0.14,-0.16); burst1200.add(bGrip);
+  const bStock = new THREE.Mesh(new THREE.BoxGeometry(0.08,0.14,0.28), darkMetal);
+  bStock.position.set(0,-0.01,-0.48); burst1200.add(bStock);
+  burst1200.position.set(0,-0.5,0.15);
+  burst1200.visible = false;
+  rightArmGroup.add(burst1200);
+
+  const secret = new THREE.Group();
+  const secCore = new THREE.Mesh(new THREE.BoxGeometry(0.13,0.16,0.88), goldGunMat);
+  secret.add(secCore);
+  const secEnergy = new THREE.Mesh(new THREE.CylinderGeometry(0.045,0.045,0.72,14), neonCyanMat);
+  secEnergy.rotation.x = Math.PI/2; secEnergy.position.set(0,0.05,0.12); secret.add(secEnergy);
+  const secMuzzle = new THREE.Mesh(new THREE.TorusGeometry(0.065,0.018,8,16), neonCyanMat);
+  secMuzzle.position.set(0,0.02,0.52); secret.add(secMuzzle);
+  const secGrip = new THREE.Mesh(new THREE.BoxGeometry(0.08,0.22,0.09), darkMetal);
+  secGrip.position.set(0,-0.15,-0.15); secret.add(secGrip);
+  secret.position.set(0,-0.5,0.16);
+  secret.visible = false;
+  rightArmGroup.add(secret);
+
+  gunParts = {pistol, rifle, smg1000, burst1200, secret};
+  playerGun = pistol;
+
+  window.secretPickupMesh = new THREE.Group();
+  const spBox = new THREE.Mesh(new THREE.BoxGeometry(1.1,1.1,1.1), goldGunMat);
+  const spRing = new THREE.Mesh(new THREE.TorusGeometry(0.95,0.07,8,24), neonCyanMat);
+  spRing.rotation.x = Math.PI/2;
+  window.secretPickupMesh.add(spBox, spRing);
+  window.secretPickupMesh.position.set(45, 1.0, 29);
+  scene.add(window.secretPickupMesh);
+
+  player.position.set(0,0,20);
+  scene.add(player);
+
+  buildHome('smallApt', homeSpawns.smallApt.x, homeSpawns.smallApt.z, 4.5, 0xd8d2c4, 0xc9bfa5, false);
+  buildHome('burjApt', homeSpawns.burjApt.x, homeSpawns.burjApt.z, 6, 0xeef3f7, 0xd7d2c8, true);
+  buildHome('house', homeSpawns.house.x, homeSpawns.house.z, 9, 0xf5e6c8, 0xe8c87a, true);
+
+  loadGameData();
+  updateFurnitureVisibility();
+
+  addEventListener('resize', ()=>{
+    camera.aspect = innerWidth/innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+  });
+}
+
+function makeCar(typeOrColor){
+  const group = new THREE.Group();
+  let color = 0xff4444;
+  let isLambo = false;
+  let isBmw = false;
+  let isToyota = false;
+
+  if(typeOrColor === 'lambo'){
+    color = 0xf1c40f; isLambo = true;
+  } else if(typeOrColor === 'bmw'){
+    color = 0x2266cc; isBmw = true;
+  } else if(typeOrColor === 'toyota'){
+    color = 0xf5f6fa; isToyota = true;
+  } else if(typeof typeOrColor === 'number'){
+    color = typeOrColor;
+  }
+
+  const bodyMat = new THREE.MeshStandardMaterial({color, metalness:0.75, roughness:0.25});
+  const glassMat = new THREE.MeshStandardMaterial({color:0x111a24, metalness:0.4, roughness:0.1});
+  const wheelMat = new THREE.MeshStandardMaterial({color:0x151515, roughness:0.9});
+  const rimMat = new THREE.MeshStandardMaterial({color:0xdddddd, metalness:0.9, roughness:0.2});
+  const lightMat = new THREE.MeshStandardMaterial({color:0xffffee, emissive:0xffffcc, emissiveIntensity:0.9});
+  const tailMat = new THREE.MeshStandardMaterial({color:0xff0000, emissive:0xff0000, emissiveIntensity:0.8});
+
+  let bodyH = 0.55, bodyW = 1.9, bodyL = 4.2;
+  if(isLambo){ bodyH = 0.42; bodyW = 1.95; bodyL = 4.4; }
+  if(isBmw){ bodyH = 0.48; bodyW = 1.92; bodyL = 4.35; }
+  if(isToyota){ bodyH = 0.52; bodyW = 1.85; bodyL = 4.1; }
+
+  const body = new THREE.Mesh(new THREE.BoxGeometry(bodyW, bodyH, bodyL), bodyMat);
+  body.position.y = bodyH/2 + 0.15; body.castShadow = true; group.add(body);
+
+  if(isToyota){
+    const badgeMat = new THREE.MeshStandardMaterial({color:0xc0c0c0, metalness:0.9, roughness:0.1});
+    const badge = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.1, 0.05), badgeMat);
+    badge.position.set(0, bodyH + 0.25, bodyL/2 - 0.15);
+    group.add(badge);
+  } else if(isBmw){
+    const bmwBase = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.07, 24), new THREE.MeshStandardMaterial({color:0x111111, metalness:0.9, roughness:0.1}));
+    bmwBase.rotation.x = Math.PI/2;
+    bmwBase.position.set(0, bodyH + 0.24, bodyL/2 - 0.22);
+    group.add(bmwBase);
+    
+    const bmwRim = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 0.08, 24), new THREE.MeshStandardMaterial({color:0xffffff, metalness:1.0, roughness:0.05, emissive:0x222222}));
+    bmwRim.rotation.x = Math.PI/2;
+    bmwRim.position.set(0, bodyH + 0.25, bodyL/2 - 0.22);
+    group.add(bmwRim);
+
+    const quadBlue = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.09), new THREE.MeshStandardMaterial({color:0x0044ff, emissive:0x001144, roughness:0.1}));
+    quadBlue.position.set(-0.032, bodyH + 0.26, bodyL/2 - 0.22);
+    group.add(quadBlue);
+
+    const quadWhite = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.09), new THREE.MeshStandardMaterial({color:0xffffff, emissive:0x444444, roughness:0.1}));
+    quadWhite.position.set(0.032, bodyH + 0.26, bodyL/2 - 0.22);
+    group.add(quadWhite);
+  } else if(isLambo){
+    const lamboMat = new THREE.MeshStandardMaterial({color:0xffd700, emissive:0x332200, metalness:0.95, roughness:0.1});
+    const lamboShield = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.35, 0.09), lamboMat);
+    lamboShield.position.set(0, bodyH + 0.26, bodyL/2 - 0.18);
+    lamboShield.rotation.x = -0.15;
+    group.add(lamboShield);
+
+    const bullBody = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.11, 0.12), new THREE.MeshStandardMaterial({color:0xffd700, emissive:0x443300, metalness:0.9}));
+    bullBody.position.set(0, bodyH + 0.29, bodyL/2 - 0.16);
+    group.add(bullBody);
+
+    const bullHorns = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.05, 0.06), lamboMat);
+    bullHorns.position.set(0, bodyH + 0.34, bodyL/2 - 0.16);
+    group.add(bullHorns);
+  }
+
+  const cabin = new THREE.Mesh(new THREE.BoxGeometry(bodyW*0.85, bodyH*0.9, bodyL*0.48), isLambo ? glassMat : bodyMat);
+  cabin.position.set(0, bodyH + bodyH*0.45, isLambo ? 0.05 : -0.1);
+  cabin.castShadow = true; group.add(cabin);
+
+  const windshield = new THREE.Mesh(new THREE.BoxGeometry(bodyW*0.82, bodyH*0.85, bodyL*0.4), glassMat);
+  windshield.position.set(0, bodyH + bodyH*0.42, isLambo ? 0.45 : 0.4);
+  group.add(windshield);
+
+  [-bodyW*0.35, bodyW*0.35].forEach(x=>{
+    const hl = new THREE.Mesh(new THREE.BoxGeometry(0.32,0.14,0.08), lightMat);
+    hl.position.set(x, bodyH*0.8, bodyL/2 + 0.02); group.add(hl);
+    const tl = new THREE.Mesh(new THREE.BoxGeometry(0.32,0.14,0.08), tailMat);
+    tl.position.set(x, bodyH*0.8, -bodyL/2 - 0.02); group.add(tl);
+  });
+
+  if(isBmw || isToyota){
+    const spoilerMat = new THREE.MeshStandardMaterial({color:0x111111, metalness:0.8, roughness:0.2});
+    const spoilerWing = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.06, 0.35), spoilerMat);
+    spoilerWing.position.set(0, bodyH + 0.42, -bodyL/2 + 0.4);
+    spoilerWing.castShadow = true;
+    group.add(spoilerWing);
+    [-0.7, 0.7].forEach(sx=>{
+      const spoilerStand = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.25, 0.1), spoilerMat);
+      spoilerStand.position.set(sx, bodyH + 0.26, -bodyL/2 + 0.4);
+      group.add(spoilerStand);
+    });
+  }
+
+  const wheelPositions = [[-bodyW/2, 0.35, bodyL*0.32],[bodyW/2, 0.35, bodyL*0.32],[-bodyW/2, 0.35, -bodyL*0.32],[bodyW/2, 0.35, -bodyL*0.32]];
+  wheelPositions.forEach(p=>{
+    const tire = new THREE.Mesh(new THREE.CylinderGeometry(0.38,0.38,0.26,16), wheelMat);
+    tire.rotation.z = Math.PI/2; tire.position.set(...p); tire.castShadow=true; group.add(tire);
+    const rim = new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.18,0.28,10), rimMat);
+    rim.rotation.z = Math.PI/2; rim.position.set(...p); group.add(rim);
+  });
+
+  let maxSpeed = 0.45;
+  let accelRate = 0.16;
+  if(isLambo){
+    maxSpeed = 0.72;
+    accelRate = 0.24;
+  } else if(isBmw){
+    maxSpeed = 0.58;
+    accelRate = 0.19;
+  } else if(isToyota){
+    maxSpeed = 0.48;
+    accelRate = 0.15;
+  }
+
+  return {group, speed:0, isAiCar: false, maxSpeed, accelRate};
+}
+
+function getWeaponDamage(){
+  const wObj = weapons.find(w => w.id === equipped.weapons);
+  return wObj ? (wObj.dmg || 1.25) : 1.25;
+}
+
+function shoot(){
+  if(inCar) return;
+  const activeGun = gunParts[equipped.weapons] || gunParts.pistol;
+  const gunWorldPos = new THREE.Vector3();
+  activeGun.getWorldPosition(gunWorldPos);
+  const angle = player.rotation.y;
+  const dir = new THREE.Vector3(Math.sin(angle),0,Math.cos(angle));
+  const isSecret = equipped.weapons === 'secret';
+  const bMesh = new THREE.Mesh(
+    new THREE.SphereGeometry(isSecret ? 0.09 : 0.055, 6, 6),
+    new THREE.MeshStandardMaterial({
+      color: isSecret ? 0x00ffff : 0xffe066,
+      emissive: isSecret ? 0x00e5ff : 0xffaa00,
+      emissiveIntensity: 1.2
+    })
+  );
+  bMesh.position.copy(gunWorldPos);
+  scene.add(bMesh);
+  bullets.push({mesh:bMesh, dir, life:60, dmg:getWeaponDamage()});
+  muzzleFlashTimer = 4;
+}
+
+function damageBot(bot, dmg, dir){
+  if(!bot || bot.dead) return false;
+  if(bot.hp === undefined) bot.hp = 5;
+  bot.hp -= dmg;
+  bot.hitFlash = 0.14;
+  if(!isWanted){
+    triggerCrimeWanted('🚨 أطلقت النار على بوت! الشرطة تطاردك، اهرب إلى بيتك!');
+  }
+  if(bot.hp <= 0){
+    killBot(bot, dir, false);
+  }
+  return true;
+}
+
+function updateBullets(){
+  bullets.forEach(b=>{
+    b.mesh.position.addScaledVector(b.dir, 2);
+    b.life--;
+    if(b.life <= 0) return;
+
+    const bx = b.mesh.position.x, bz = b.mesh.position.z;
+    for(const bot of npcs){
+      if(bot.dead) continue;
+      if(Math.hypot(bot.group.position.x - bx, bot.group.position.z - bz) < 0.85){
+        damageBot(bot, b.dmg, b.dir);
+        b.life = 0;
+        return;
+      }
+    }
+    for(const p of fightPairs){
+      if(p.state === 'cooldown') continue;
+      for(const bt of [p.a, p.b]){
+        if(!bt.group.visible || bt.dead) continue;
+        if(Math.hypot(bt.group.position.x - bx, bt.group.position.z - bz) < 0.85){
+          damageBot(bt, b.dmg, b.dir);
+          b.life = 0;
+          return;
+        }
+      }
+    }
+  });
+  bullets = bullets.filter(b=>{
+    if(b.life<=0){ scene.remove(b.mesh); return false; }
+    return true;
+  });
+  if(playerGun){
+    const activeGun = gunParts[equipped.weapons] || gunParts.pistol;
+    if(muzzleFlashTimer>0){ muzzleFlashTimer--; activeGun.scale.set(1.25,1.25,1.25);} 
+    else activeGun.scale.set(1,1,1);
+  }
+}
+
+function updateShowCar(dt){
+  if(!showCar) return;
+  showCar.angle += dt*1.4;
+  const r = 9;
+  const targetX = showCar.center.x + Math.cos(showCar.angle)*r;
+  const targetZ = showCar.center.z + Math.sin(showCar.angle)*r;
+  const prevX = showCar.group.position.x, prevZ = showCar.group.position.z;
+  showCar.group.position.x = targetX;
+  showCar.group.position.z = targetZ;
+  showCar.group.rotation.y = Math.atan2(targetX-prevX, targetZ-prevZ);
+  showCar.driftTimer = (showCar.driftTimer||0)+1;
+  if(showCar.driftTimer % 3 === 0){
+    const back = new THREE.Vector3(-Math.sin(showCar.group.rotation.y),0,-Math.cos(showCar.group.rotation.y));
+    [-0.95,0.95].forEach(side=>{
+      const pos = showCar.group.position.clone()
+        .addScaledVector(back, 1.3)
+        .addScaledVector(new THREE.Vector3(Math.cos(showCar.group.rotation.y),0,-Math.sin(showCar.group.rotation.y)), side);
+      pos.y = 0.3;
+      spawnSmoke(pos);
+    });
+  }
+}
+
+function updateLabels(){
+  landmarks.forEach(l=>{
+    const pos = new THREE.Vector3(l.pos.x, l.h, l.pos.z);
+    pos.project(camera);
+    if(pos.z>1){ l.labelEl.style.display='none'; return; }
+    const sx = (pos.x*0.5+0.5)*innerWidth;
+    const sy = (-pos.y*0.5+0.5)*innerHeight;
+    l.labelEl.style.display='block';
+    l.labelEl.style.left = sx+'px';
+    l.labelEl.style.top = sy+'px';
+  });
+}
+
+function toggleCar(){
+  if(inCar){
+    setCarViewMode('third');
+    inCar.group.visible = true;
+    player.position.copy(inCar.group.position);
+    player.position.y = 0;
+    player.visible = true;
+    inCar = null;
+    document.getElementById('wheelUI').style.display='none';
+    document.getElementById('brakeBtn').style.display='none';
+    document.getElementById('reverseBtn').style.display='none';
+    document.getElementById('exitCarBtn').style.display='none';
+    document.getElementById('viewToggleBtn').style.display='none';
+    document.getElementById('carBtn').textContent='🚗 ركوب';
+    return;
+  }
+  for(const car of cars){
+    if(player.position.distanceTo(car.group.position) < 4){
+      inCar = car;
+      inCar.speed = 0;
+      player.visible = false;
+      document.getElementById('wheelUI').style.display='block';
+      document.getElementById('brakeBtn').style.display='block';
+      document.getElementById('reverseBtn').style.display='block';
+      document.getElementById('exitCarBtn').style.display='block';
+      document.getElementById('viewToggleBtn').style.display='block';
+      document.getElementById('carBtn').textContent='🚗 داخل السيارة';
+      setCarViewMode('third');
+      break;
+    }
+  }
+}
+
+function collideBuildings(x,z,radius){
+  for(const b of buildings){
+    if(Math.abs(x-b.x) < b.w/2+radius && Math.abs(z-b.z) < b.d/2+radius){
+      return b;
+    }
+  }
+  return null;
+}
+
+function updateJumpAnimation(dt){
+  if(!player) return;
+  const rising = velocity.y > 0;
+  const targetLegL = rising ? -0.75 : 0.45;
+  const targetLegR = rising ? 0.55 : -0.35;
+  const targetArmL = rising ? -1.45 : -0.9;
+  const targetArmR = rising ? -1.55 : -1.0;
+  const targetTiltX = rising ? -0.14 : 0.12;
+
+  player.legL.rotation.x += (targetLegL - player.legL.rotation.x) * Math.min(1, dt * 12);
+  player.legR.rotation.x += (targetLegR - player.legR.rotation.x) * Math.min(1, dt * 12);
+  player.armL.rotation.x += (targetArmL - player.armL.rotation.x) * Math.min(1, dt * 12);
+  player.armL.rotation.z += (-0.28 - player.armL.rotation.z) * Math.min(1, dt * 10);
+  playerArm.rotation.x += (targetArmR - playerArm.rotation.x) * Math.min(1, dt * 12);
+  player.rotation.x += (targetTiltX - player.rotation.x) * Math.min(1, dt * 10);
+  player.rotation.z *= 0.85;
+}
+
+function updateRunAnimation(dt, moving){
+  if(!player) return;
+  if(!onGround && !isFlying){
+    updateJumpAnimation(dt);
+    return;
+  }
+  player.rotation.x += (0 - player.rotation.x) * 0.25;
+  player.armL.rotation.z += (0.15 - player.armL.rotation.z) * 0.2;
+  if(moving){
+    player.runTime += dt * 13.5;
+    const swing = Math.sin(player.runTime);
+    const swing2 = Math.sin(player.runTime + Math.PI);
+
+    player.legL.rotation.x = swing * 0.82;
+    player.legR.rotation.x = swing2 * 0.82;
+    player.armL.rotation.x = swing * 0.65;
+    playerArm.rotation.x = -0.8 + swing2 * 0.65;
+    
+    player.rotation.z = Math.sin(player.runTime * 0.5) * 0.045;
+    if(onGround) player.position.y = Math.abs(Math.sin(player.runTime * 2)) * 0.035;
+  }else{
+    player.legL.rotation.x *= 0.8;
+    player.legR.rotation.x *= 0.8;
+    player.armL.rotation.x *= 0.8;
+    playerArm.rotation.x += (-0.8 - playerArm.rotation.x) * 0.18;
+    player.rotation.z += (0 - player.rotation.z) * 0.2;
+    if(onGround) player.position.y = 0;
+    player.runTime = 0;
+  }
+}
+
+function updatePlayer(dt){
+  if(isSleeping || prisonTimeLeft > 0) return;
+  let mx=0, mz=0;
+  if(keys['w']||keys['arrowup']) mz-=1;
+  if(keys['s']||keys['arrowdown']) mz+=1;
+  if(keys['a']||keys['arrowleft']) mx-=1;
+  if(keys['d']||keys['arrowright']) mx+=1;
+  mx += joyVec.x; mz += joyVec.y;
+  const len = Math.hypot(mx,mz);
+
+  if(inCar){
+    let turn=0, accel=0;
+    const carAccel = inCar.accelRate || 0.16;
+    const carMaxSpeed = inCar.maxSpeed || 0.45;
+
+    if((mz<0 || keys['w']) && !wantBrake && !wantReverse) accel = carAccel;
+    if(((mz>0 || keys['s']) || wantReverse) && !wantBrake) accel = -carAccel * 0.7;
+    if(wantReverse) accel = -carAccel * 0.9;
+    const steerX = Math.abs(mx) > 0.25 ? mx : 0;
+    if(steerX<0) turn = 0.032;
+    if(steerX>0) turn = -0.032;
+    const frameScale = dt*60;
+    inCar.speed = (inCar.speed||0)*0.965 + accel*frameScale*0.36;
+    const targetRoll = -steerX * Math.min(1, Math.abs(inCar.speed)*3) * 0.06;
+    inCar.group.rotation.z += (targetRoll - inCar.group.rotation.z) * 0.15;
+
+    const isDrifting = wantBrake && steerX!==0 && Math.abs(inCar.speed) > 0.18;
+    if(isDrifting){
+      inCar.speed *= 0.985;
+      turn *= 2.6;
+      inCar.driftTimer = (inCar.driftTimer||0) + 1;
+      if(inCar.driftTimer % 3 === 0){
+        const back = new THREE.Vector3(-Math.sin(inCar.group.rotation.y),0,-Math.cos(inCar.group.rotation.y));
+        [-0.95,0.95].forEach(side=>{
+          const pos = inCar.group.position.clone()
+            .addScaledVector(back, 1.3)
+            .addScaledVector(new THREE.Vector3(Math.cos(inCar.group.rotation.y),0,-Math.sin(inCar.group.rotation.y)), side);
+          pos.y = 0.3;
+          spawnSmoke(pos);
+        });
+      }
+    } else if(wantBrake){
+      inCar.speed *= 0.88;
+      inCar.driftTimer = 0;
+    } else {
+      inCar.driftTimer = 0;
+    }
+
+    inCar.speed = Math.max(-carMaxSpeed*0.4, Math.min(carMaxSpeed, inCar.speed));
+    const movingFactor = Math.min(1, Math.abs(inCar.speed)/0.08);
+    inCar.group.rotation.y += turn * movingFactor * frameScale;
+    const dir = new THREE.Vector3(Math.sin(inCar.group.rotation.y),0,Math.cos(inCar.group.rotation.y));
+    
+    const nextCarX = inCar.group.position.x + dir.x * inCar.speed;
+    const nextCarZ = inCar.group.position.z + dir.z * inCar.speed;
+
+    if(isWanted){
+      policeCars.forEach(pc=>{
+        if(pc !== inCar && pc.group.position.distanceTo(inCar.group.position) < 4.5){
+          triggerArrest();
+        }
+      });
+    }
+
+    inCar.group.position.x = nextCarX;
+    inCar.group.position.z = nextCarZ;
+
+    if(isWanted){
+      const ownedHomeKeys = [];
+      if(smallAptOwned) ownedHomeKeys.push('smallApt');
+      if(burjAptOwned) ownedHomeKeys.push('burjApt');
+      if(houseOwned) ownedHomeKeys.push('house');
+      if(currentHome && !ownedHomeKeys.includes(currentHome)) ownedHomeKeys.push(currentHome);
+      for(const hk of ownedHomeKeys){
+        const hSpot = homeSpawns[hk];
+        if(Math.hypot(nextCarX - hSpot.x, nextCarZ - hSpot.z) < 18){
+          currentHome = hk;
+          escapePoliceAtHome();
+          break;
+        }
+      }
+    }
+
+    document.getElementById('wheelUI').style.transform = `translateX(-50%) rotate(${steerX*-45}deg)`;
+    if(steeringWheelGroup) steeringWheelGroup.rotation.z = steerX*-1.1;
+
+    if(carViewMode==='first'){
+      const seatLocal = new THREE.Vector3(-0.32, 1.02, 0.15);
+      const seatWorld = inCar.group.localToWorld(seatLocal.clone());
+      camera.position.copy(seatWorld);
+      const lookYaw = inCar.group.rotation.y + Math.max(-0.9,Math.min(0.9,camYaw*0.5));
+      const lookTarget = new THREE.Vector3(
+        seatWorld.x + Math.sin(lookYaw),
+        seatWorld.y + Math.sin(camPitch)*0.6,
+        seatWorld.z + Math.cos(lookYaw)
+      );
+      camera.lookAt(lookTarget);
+    } else {
+      const carCamAngle = inCar.group.rotation.y + camYaw;
+      const carDist = 9;
+      const carHorizontal = Math.cos(camPitch) * carDist;
+      camera.position.set(
+        inCar.group.position.x - Math.sin(carCamAngle)*carHorizontal,
+        inCar.group.position.y + 1 + Math.sin(camPitch)*carDist,
+        inCar.group.position.z - Math.cos(carCamAngle)*carHorizontal
+      );
+      camera.lookAt(inCar.group.position.x, inCar.group.position.y+1, inCar.group.position.z);
+    }
+    return;
+  }
+
+  if(len>0){
+    mx/=len; mz/=len;
+    if(!isFlying) updateRunAnimation(dt, true);
+    const moveAngle = Math.atan2(mx,mz);
+    player.rotation.y = moveAngle;
+    
+    let baseSpd = 7;
+    if(isFastActive) baseSpd = 24;
+    const speed = (isFlying ? 22 : baseSpd)*dt;
+    
+    const nx = player.position.x + mx*speed;
+    const nz = player.position.z + mz*speed;
+    if(isFlying && player.position.y > 1.5){
+      player.position.x = nx;
+      player.position.z = nz;
+    } else if(!collideBuildings(nx,nz,0.5)){
+      player.position.x = nx;
+      player.position.z = nz;
+    }
+  }
+
+  if(len===0 || isFlying){ updateRunAnimation(dt, false); }
+
+  if(window.secretPickupMesh && window.secretPickupMesh.visible){
+    window.secretPickupMesh.rotation.y += dt * 2.2;
+    window.secretPickupMesh.position.y = 1.0 + Math.sin(performance.now()/280)*0.2;
+    if(!owned.weapons.includes('secret') && Math.hypot(player.position.x - 45, player.position.z - 29) < 2.2){
+      owned.weapons.push('secret');
+      equipped.weapons = 'secret';
+      Object.keys(gunParts).forEach(k=> gunParts[k].visible = (k==='secret'));
+      window.secretPickupMesh.visible = false;
+      saveGameData();
+      toast('⚡ مبروك! حصلت على السلاح السري (طلقة واحدة تقضي على البوت)!');
+    }
+  }
+
+  const ownedHomeKeys = [];
+  if(smallAptOwned) ownedHomeKeys.push('smallApt');
+  if(burjAptOwned) ownedHomeKeys.push('burjApt');
+  if(houseOwned) ownedHomeKeys.push('house');
+  if(currentHome && !ownedHomeKeys.includes(currentHome)) ownedHomeKeys.push(currentHome);
+
+  if(isWanted && ownedHomeKeys.length > 0){
+    for(const hk of ownedHomeKeys){
+      const hSpot = homeSpawns[hk];
+      if(Math.hypot(player.position.x - hSpot.x, player.position.z - hSpot.z) < 16){
+        currentHome = hk;
+        isAtHome = true;
+        escapePoliceAtHome();
+        break;
+      }
+    }
+  }
+
+  if(currentHome){
+    const spot = homeSpawns[currentHome];
+    const distFromHome = Math.hypot(player.position.x - spot.x, player.position.z - spot.z);
+    const nowAtHome = distFromHome < 45;
+    if(nowAtHome !== isAtHome){
+      isAtHome = nowAtHome;
+      updateLocationButtons();
+    }
+  }
+
+  const bankBldg = buildings.find(b=>b.isBank);
+  if(bankBldg){
+    const distToBank = Math.hypot(player.position.x - bankBldg.x, player.position.z - bankBldg.z);
+    const bankModal = document.getElementById('bankModal');
+    if(distToBank >= 10){
+      bankClosedManually = false;
+    }
+    if(distToBank < 10){
+      if(bankModal.style.display !== 'flex' && !isRobbingBank && !bankClosedManually){
+        bankModal.style.display = 'flex';
+        document.getElementById('bankDialogText').textContent = 'مرحباً بك في بنك الراجحي. أنا موظف البنك الذكي، كيف أستطيع خدمتك؟';
+      }
+    } else {
+      if(bankModal.style.display === 'flex' && !isRobbingBank){
+        bankModal.style.display = 'none';
+      }
+    }
+  }
+
+  if(isFlying){
+    if(flyUpPressed || wantJump || keys[' ']){
+      player.position.y += 1.2;
+    }
+    if(flyDownPressed || keys['shift'] || keys['c']){
+      player.position.y = Math.max(0, player.position.y - 1.2);
+    }
+    velocity.y = 0;
+    onGround = false;
+  } else {
+    if(wantJump && onGround){ velocity.y = 6; onGround=false; wantJump=false; }
+    velocity.y -= 18*dt;
+    player.position.y += velocity.y*dt;
+    if(player.position.y <= 0){ player.position.y = 0; velocity.y=0; onGround=true; }
+  }
+
+  const camDist = 7;
+  const playerHorizontal = Math.cos(camPitch) * camDist;
+  camera.position.set(
+    player.position.x - Math.sin(camYaw)*playerHorizontal,
+    player.position.y + 1.2 + Math.sin(camPitch)*camDist,
+    player.position.z - Math.cos(camYaw)*playerHorizontal
+  );
+  camera.lookAt(player.position.x, player.position.y+1.2, player.position.z);
+}
+
+document.getElementById('closeBankBtn').addEventListener('click', ()=>{
+  bankClosedManually = true;
+  document.getElementById('bankModal').style.display = 'none';
+});
+
+document.getElementById('askAiBtn').addEventListener('click', ()=>{
+  const responses = [
+    "مرحباً طلال! يمكنك إيداع أموالك بأمان في الصراف الآلي لكي تحميها.",
+    "هل تعلم أن سرقة خزنة بنك الراجحي تمنحك 20,000 ريال؟ لكن احذر من الشرطة!",
+    "إذا طاردتك الشرطة، حاول الهروب إلى شقتك أو قصرك الذي اشترته لتختبئ هناك.",
+    "يمكنك شراء أداة التهديد من المتجر إذا أردت السطو على البنك."
+  ];
+  const rand = responses[Math.floor(Math.random()*responses.length)];
+  document.getElementById('bankDialogText').textContent = rand;
+});
+
+document.getElementById('atmDepositBtn').addEventListener('click', ()=>{
+  if(coins <= 0){
+    document.getElementById('bankDialogText').textContent = '❌ لا تملك عملات كافية لإيداعها في الصراف الآلي.';
+    return;
+  }
+  const amount = coins;
+  bankBalance += amount;
+  coins = 0;
+  document.getElementById('coinsVal').textContent = coins;
+  document.getElementById('bankVal').textContent = bankBalance;
+  saveGameData();
+  document.getElementById('bankDialogText').textContent = `✅ تم إيداع جميع أموالك (${amount} ريال) في الصراف الآلي بنجاح!`;
+});
+
+document.getElementById('atmWithdrawBtn').addEventListener('click', ()=>{
+  if(bankBalance <= 0){
+    document.getElementById('bankDialogText').textContent = '❌ حسابك في البنك فارغ.';
+    return;
+  }
+  const amount = bankBalance;
+  coins += amount;
+  bankBalance = 0;
+  document.getElementById('coinsVal').textContent = coins;
+  document.getElementById('bankVal').textContent = bankBalance;
+  saveGameData();
+  document.getElementById('bankDialogText').textContent = `✅ تم سحب (${amount} ريال) من حسابك البنكي.`;
+});
+
+document.getElementById('robBankBtn').addEventListener('click', ()=>{
+  if(!hasThreatTool){
+    document.getElementById('bankDialogText').textContent = '❌ موظف البنك يقول: "لا أخشاك!" — يجب عليك شراء أداة التهديد من المتجر أولاً (750 عملة).';
+    return;
+  }
+  if(isRobbingBank) return;
+  isRobbingBank = true;
+  document.getElementById('bankDialogText').textContent = '⚠️ أنت تهدد موظف البنك بسلاحك وأداتك: "وخر عن وجهي بسرعة!"... الموظف يرتجف ويفتح الخزنة!';
+  
+  setTimeout(()=>{
+    coins += 20000;
+    document.getElementById('coinsVal').textContent = coins;
+    isWanted = true;
+    saveGameData();
+    document.getElementById('bankDialogText').textContent = '💰 لقد سرقت 20,000 ريال من خزنة بنك الراجحي! هرع الان واهرب قبل أن تصل الشرطة!';
+    toast('🚨 تم السطو على بنك الراجحي! الشرطة تطاردك!');
+    
+    policeCars.forEach(pc=>{
+      const bankBldg = buildings.find(b=>b.isBank);
+      pc.group.position.set(bankBldg.x + 12, 0.4, bankBldg.z + 12);
+      pc.task = { robbery: true, t: 0 };
+      pc.sirenOn = true;
+    });
+
+    setTimeout(()=>{
+      document.getElementById('bankModal').style.display = 'none';
+      isRobbingBank = false;
+    }, 2500);
+  }, 2000);
+});
+
+function triggerArrest(){
+  if(prisonTimeLeft > 0) return;
+  prisonTimeLeft = 60;
+  isWanted = false;
+  updateLocationButtons();
+  if(inCar) toggleCar();
+  const prisonEl = document.getElementById('prisonOverlay');
+  prisonEl.style.display = 'flex';
+  
+  const timerInt = setInterval(()=>{
+    prisonTimeLeft--;
+    document.getElementById('prisonTimer').textContent = prisonTimeLeft;
+    if(prisonTimeLeft <= 0){
+      clearInterval(timerInt);
+      prisonEl.style.display = 'none';
+      player.position.set(0, 0, 20);
+      updateLocationButtons();
+      toast('🔓 انتهت مدة السجن! تم الإفراج عنك.');
+    }
+  }, 1000);
+}
+
+document.querySelectorAll('button, #joy, #shopPanel, #housingPanel, #codesPanel, #jobPanel, #bankModal').forEach(el => {
+  el.addEventListener('pointerdown', e => e.stopPropagation());
+  el.addEventListener('touchstart', e => e.stopPropagation());
+  el.addEventListener('touchmove', e => e.stopPropagation());
+  el.addEventListener('touchend', e => e.stopPropagation());
+});
+
+let policeCars=[], fightPairs=[], phoneOpen=false, phoneScreen='home', phMsg='', callInfo=null;
+let missionMarker=null, activeMissionPair=null, fireHeld=false, fireCd=0, audioCtx=null, sirenNodes=null, pairSeq=0, phTick=0, toastT=null;
+const phoneEl=document.getElementById('phone'), phScreen=document.getElementById('phScreen'), toastEl=document.getElementById('toast'), sirenBtn=document.getElementById('sirenBtn');
+
+function toast(m){ toastEl.textContent=m; toastEl.style.display='block'; clearTimeout(toastT); toastT=setTimeout(()=>toastEl.style.display='none',3500); }
+function playerPos(){ return inCar ? inCar.group.position : player.position; }
+function nearLandmark(x,z){ let b=null,bd=1e9; landmarks.forEach(l=>{const d=Math.hypot(l.pos.x-x,l.pos.z-z); if(d<bd){bd=d;b=l;}}); return b?b.name:'الشارع'; }
+function addCoins(n){ coins+=n; document.getElementById('coinsVal').textContent=coins; saveGameData(); }
+
+function policeTextTex(){
+  const c=document.createElement('canvas'); c.width=256; c.height=80; const x=c.getContext('2d');
+  x.fillStyle='#0b7a3b'; x.font='bold 50px Tahoma,Arial'; x.textAlign='center'; x.textBaseline='middle';
+  x.fillText('شرطة',128,30); x.font='bold 22px Arial'; x.fillText('POLICE',128,66);
+  return new THREE.CanvasTexture(c);
+}
+function makePoliceCar(){
+  const car=makeCar(0xf4f6f8), g=car.group;
+  const green=new THREE.MeshStandardMaterial({color:0x0b7a3b,roughness:0.5,metalness:0.3});
+  const black=new THREE.MeshStandardMaterial({color:0x111111});
+  const txtMat=new THREE.MeshBasicMaterial({map:policeTextTex(),transparent:true,polygonOffset:true,polygonOffsetFactor:-2});
+  [-1,1].forEach(s=>{
+    const st=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.2,3.7),green); st.position.set(s*0.96,0.33,0); g.add(st);
+    const tx=new THREE.Mesh(new THREE.PlaneGeometry(1.5,0.47),txtMat); tx.position.set(s*0.99,0.58,0); tx.rotation.y=s*Math.PI/2; g.add(tx);
+  });
+  const hood=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.02,1.3),green); hood.position.set(0,0.71,1.45); g.add(hood);
+  const bumper=new THREE.Mesh(new THREE.BoxGeometry(1.9,0.12,0.06),green); bumper.position.set(0,0.3,2.12); g.add(bumper);
+  const redMat=new THREE.MeshStandardMaterial({color:0xff1111,emissive:0xff0000,emissiveIntensity:0.08});
+  const blueMat=new THREE.MeshStandardMaterial({color:0x1166ff,emissive:0x0033ff,emissiveIntensity:0.08});
+  const base=new THREE.Mesh(new THREE.BoxGeometry(1.3,0.07,0.36),black); base.position.set(0,1.09,-0.1); g.add(base);
+  const lr=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.15,0.3),redMat); lr.position.set(-0.32,1.19,-0.1); g.add(lr);
+  const lb=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.15,0.3),blueMat); lb.position.set(0.32,1.19,-0.1); g.add(lb);
+  Object.assign(car,{isPolice:true,redMat,blueMat,sirenOn:false,task:null,parked:false,maxSpeed:0.56,accelRate:0.19,aiTimer:0});
+  return car;
+}
+function spawnPolice(x,z,ry){
+  const c=makePoliceCar(); c.group.position.set(x,0.4,z); c.group.rotation.y=ry;
+  scene.add(c.group); cars.push(c); policeCars.push(c); return c;
+}
+function sirenSound(on){
+  try{
+    if(on){
+      if(sirenNodes) return;
+      audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();
+      if(audioCtx.state==='suspended') audioCtx.resume();
+      const o=audioCtx.createOscillator(), l=audioCtx.createOscillator(), lg=audioCtx.createGain(), g=audioCtx.createGain();
+      o.type='sawtooth'; o.frequency.value=850; l.frequency.value=1.1; lg.gain.value=260; g.gain.value=0.04;
+      l.connect(lg); lg.connect(o.frequency); o.connect(g); g.connect(audioCtx.destination); o.start(); l.start();
+      sirenNodes={o,l,g};
+    } else if(sirenNodes){ sirenNodes.o.stop(); sirenNodes.l.stop(); sirenNodes.g.disconnect(); sirenNodes=null; }
+  }catch(e){}
+}
+function toggleSiren(){ if(inCar&&inCar.isPolice){ inCar.sirenOn=!inCar.sirenOn; } }
+sirenBtn.addEventListener('click',toggleSiren);
+addEventListener('keydown',e=>{ if(e.key.toLowerCase()==='l') toggleSiren(); });
+
+function updatePolice(dt){
+  policeCars.forEach(c=>{
+    const g=c.group;
+    if(c===inCar){ c.task=null; c.parked=true; return; }
+    g.position.y=0.4;
+    let tx=null,tz=null,stop=6;
+    const tk=c.task;
+    if(isWanted){
+      const pp = playerPos();
+      tx = pp.x; tz = pp.z; stop = 5; c.sirenOn = true; c.parked = false;
+      if(Math.hypot(g.position.x - pp.x, g.position.z - pp.z) < 5){
+        triggerArrest();
+      }
+    } else if(tk){
+      c.parked=false;
+      if(tk.pair){
+        const p=tk.pair;
+        if(p.state==='cooldown'){ c.task=null; }
+        else if(p.state==='flee'){ tx=p.a.group.position.x; tz=p.a.group.position.z; stop=3; }
+        else { tx=p.pos.x; tz=p.pos.z; stop=(p.state==='arrested')?6:8; }
+      } else if(tk.player){
+        const pp=playerPos(); tx=pp.x; tz=pp.z; stop=7; tk.t+=dt;
+        if(tk.t>60) c.task=null;
+      }
+    }
+    if((c.task || isWanted) && tx!==null){
+      const dx=tx-g.position.x, dz=tz-g.position.z, d=Math.hypot(dx,dz);
+      let diff=Math.atan2(dx,dz)-g.rotation.y; diff=Math.atan2(Math.sin(diff),Math.cos(diff));
+      g.rotation.y+=Math.max(-2.8*dt,Math.min(2.8*dt,diff));
+      const want=Math.max(0,Math.min(0.48,(d-stop)*0.05));
+      c.speed+=(want-c.speed)*Math.min(1,dt*4);
+      c.sirenOn=true;
+    } else {
+      c.sirenOn=false;
+      if(c.parked){ c.speed*=0.9; }
+      else {
+        c.aiTimer-=dt; if(c.aiTimer<=0){ c.aiTimer=3+Math.random()*5; g.rotation.y+=(Math.random()-0.5)*1.8; }
+        if(Math.abs(g.position.x)>270||Math.abs(g.position.z)>270) g.rotation.y=Math.atan2(-g.position.x,-g.position.z);
+        c.speed+=(0.11-c.speed)*Math.min(1,dt*3);
+      }
+    }
+    g.position.x+=Math.sin(g.rotation.y)*c.speed*dt*60;
+    g.position.z+=Math.cos(g.rotation.y)*c.speed*dt*60;
+  });
+}
+function policeNear(x,z,r,sirenOnly){
+  for(const c of policeCars){
+    if(sirenOnly && !(c===inCar||c.sirenOn)) continue;
+    if(Math.hypot(c.group.position.x-x,c.group.position.z-z)<r) return c;
+  }
+  return null;
+}
+function nearestFreePolice(x,z){
+  let best=null,bd=1e9;
+  policeCars.forEach(c=>{ if(c===inCar||c.task) return; const d=Math.hypot(c.group.position.x-x,c.group.position.z-z); if(d<bd){bd=d;best=c;} });
+  return {car:best,dist:bd};
+}
+function requestPolice(){
+  const pp=playerPos();
+  let r=nearestFreePolice(pp.x,pp.z), c=r.car;
+  if((!c||r.dist>140) && policeCars.length<6){
+    const x=Math.max(-250,Math.min(250,pp.x+(Math.random()<0.5?-70:70)));
+    c=spawnPolice(x,(Math.random()-0.5)*4,0);
+  }
+  if(!c) return false;
+  c.task={player:true,t:0}; c.sirenOn=true;
+  toast('🚓 دورية في الطريق إليك');
+  return true;
+}
+
+function randStreetPos(){
+  for(let i=0;i<20;i++){
+    const along=(Math.random()<0.5?-1:1)*(25+Math.random()*130), off=(Math.random()-0.5)*6;
+    const p=Math.random()<0.5?{x:along,z:off}:{x:off,z:along};
+    if(!collideBuildings(p.x,p.z,3)) return p;
+  }
+  return {x:30,z:3};
+}
+function makePair(delay){
+  const a=makeHumanoidBot(0xc0392b,0x222222,0x111111), b=makeHumanoidBot(0x2980b9,0x222222,0x3d2314);
+  scene.add(a.group); scene.add(b.group); a.group.visible=b.group.visible=false;
+  fightPairs.push({id:++pairSeq,a,b,state:'cooldown',t:8-delay,pos:{x:0,z:0},ang:0,reported:false,accepted:false,hold:0,nextTry:3,fa:[0,0]});
+}
+function resetArms(bt){
+  bt.armL.position.set(-0.39,1.18,0); bt.armL.rotation.set(0,0,0.12);
+  bt.armR.position.set(0.39,1.18,0); bt.armR.rotation.set(0,0,-0.12);
+  bt.legL.rotation.x=0; bt.legR.rotation.x=0;
+}
+function startFight(p,pos){
+  const s=pos||randStreetPos();
+  p.pos={x:s.x,z:s.z}; p.ang=Math.random()*6.28; p.state='fight'; p.t=0; p.reported=false; p.accepted=false; p.hold=0; p.nextTry=3;
+  [p.a,p.b].forEach(bt=>{ bt.group.visible=true; resetArms(bt); });
+}
+function endPair(p){ p.state='cooldown'; p.t=0; p.a.group.visible=false; p.b.group.visible=false; if(activeMissionPair===p) activeMissionPair=null; }
+function dispatchPolice(p){
+  const r=nearestFreePolice(p.pos.x,p.pos.z); if(!r.car) return false;
+  r.car.task={pair:p}; r.car.sirenOn=true; return true;
+}
+function arrest(p){
+  p.state='arrested'; p.hold=0;
+  [p.a,p.b].forEach(bt=>{ bt.legL.rotation.x=0; bt.legR.rotation.x=0; bt.armL.position.set(-0.39,1.6,0); bt.armL.rotation.set(0,0,0); bt.armR.position.set(0.39,1.6,0); bt.armR.rotation.set(0,0,0); bt.group.position.y=0; });
+  const pp=playerPos();
+  if(isPoliceJob()){
+    if(p.accepted){ addCoins(500); toast('✅ تمت المهمة! +500 💰'); activeMissionPair=null; }
+    else if(Math.hypot(pp.x-p.pos.x,pp.z-p.pos.z)<40){ addCoins(200); toast('👮 تم القبض على المتشاجرين +200 💰'); }
+    else toast('👮 الشرطة قبضت على المتشاجرين');
+  } else {
+    if(p.accepted) activeMissionPair=null;
+    toast('👮 الشرطة قبضت على المتشاجرين');
+  }
+}
+function updatePairs(dt){
+  for(const p of fightPairs){
+    p.t+=dt;
+    const A=p.a.group, B=p.b.group;
+    if(p.state==='cooldown'){ if(p.t>8) startFight(p, p.id===1&&!p.started?(p.started=true,{x:3,z:42}):null); continue; }
+    [p.a, p.b].forEach(bt=>{
+      if(bt.dead){
+        animateBotDeath(bt, dt);
+      } else if(inCar && Math.abs(inCar.speed || 0) > 0.08 && bt.group.visible){
+        if(Math.hypot(inCar.group.position.x - bt.group.position.x, inCar.group.position.z - bt.group.position.z) < 2.2){
+          const cDir = new THREE.Vector3(Math.sin(inCar.group.rotation.y), 0, Math.cos(inCar.group.rotation.y));
+          killBot(bt, cDir, true);
+        }
+      }
+    });
+    if(p.a.dead && p.b.dead){
+      if(p.a.deathTimer > 4.5 && p.b.deathTimer > 4.5){
+        p.a.dead = false; p.b.dead = false; p.a.hp = 5; p.b.hp = 5;
+        p.a.group.rotation.set(0,0,0); p.b.group.rotation.set(0,0,0);
+        endPair(p);
+      }
+      continue;
+    }
+    if(p.state==='fight'){
+      p.ang+=dt*0.6; p.pos.x+=Math.cos(p.ang*1.7)*dt*0.4; p.pos.z+=Math.sin(p.ang*1.3)*dt*0.4;
+      const ox=Math.cos(p.ang)*0.6, oz=Math.sin(p.ang)*0.6;
+      A.position.set(p.pos.x+ox,0,p.pos.z+oz); B.position.set(p.pos.x-ox,0,p.pos.z-oz);
+      A.rotation.y=Math.atan2(-ox,-oz); B.rotation.y=Math.atan2(ox,oz);
+      const w=p.t*10;
+      p.a.armR.rotation.x=-1.5*Math.max(0,Math.sin(w)); p.a.armL.rotation.x=-1.5*Math.max(0,Math.sin(w+Math.PI));
+      p.b.armR.rotation.x=-1.5*Math.max(0,Math.sin(w+1.6)); p.b.armL.rotation.x=-1.5*Math.max(0,Math.sin(w+4.7));
+      p.a.legL.rotation.x=Math.sin(w)*0.3; p.a.legR.rotation.x=-Math.sin(w)*0.3; p.b.legL.rotation.x=-Math.sin(w)*0.3; p.b.legR.rotation.x=-Math.sin(w)*0.3;
+      A.position.y=Math.abs(Math.sin(w))*0.05; B.position.y=Math.abs(Math.cos(w))*0.05;
+      if(!p.reported && p.t>p.nextTry){
+        if(dispatchPolice(p)){ p.reported=true; toast('🚨 بلاغ شجار قرب '+nearLandmark(p.pos.x,p.pos.z)); }
+        else p.nextTry=p.t+3;
+      }
+      if(policeNear(p.pos.x,p.pos.z,16,true)){
+        p.state='flee'; p.t=0; p.fa=[Math.random()*6.28,Math.random()*6.28];
+        [p.a,p.b].forEach(resetArms); toast('🏃 المتشاجرون هربوا والشرطة تطاردهم!');
+      }
+    } else if(p.state==='flee'){
+      [p.a,p.b].forEach((bt,i)=>{
+        const g=bt.group, c=policeNear(g.position.x,g.position.z,60,true);
+        let ang=c?Math.atan2(g.position.x-c.group.position.x,g.position.z-c.group.position.z)+(i?0.6:-0.6):p.fa[i];
+        g.rotation.y=ang; g.position.x=Math.max(-290,Math.min(290,g.position.x+Math.sin(ang)*6.5*dt)); g.position.z=Math.max(-290,Math.min(290,g.position.z+Math.cos(ang)*6.5*dt));
+        const sw=Math.sin(p.t*14); bt.legL.rotation.x=sw*0.8; bt.legR.rotation.x=-sw*0.8; bt.armL.rotation.x=-sw*0.7; bt.armR.rotation.x=sw*0.7;
+      });
+      p.pos.x=A.position.x; p.pos.z=A.position.z;
+      if(policeNear(A.position.x,A.position.z,4.5,false)||policeNear(B.position.x,B.position.z,4.5,false)) arrest(p);
+      else if(p.t>45) endPair(p);
+    } else if(p.state==='arrested'){
+      p.hold+=dt; if(p.hold>6) endPair(p);
+    }
+  }
+}
+
+const contacts=[{n:'الشرطة',num:'999',pol:1},{n:'المرور',num:'993',pol:1},{n:'الإسعاف',num:'997'},{n:'الدفاع المدني',num:'998'}];
+function renderPhone(){
+  const d=new Date(); document.getElementById('phClock').textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  const cop = isPoliceJob();
+  if(!cop && (phoneScreen==='police' || phoneScreen==='reports')) phoneScreen='home';
+  let h='';
+  if(phoneScreen==='home'){
+    h='<div class="apps">';
+    h+='<button data-go="garage">🚘<span>الكراج</span></button>';
+    h+='<button data-go="call">📞<span>اتصال</span></button>';
+    if(cop){
+      h+='<button data-go="police">🚓<span>طلب شرطة</span></button>';
+      h+='<button data-go="reports">📋<span>البلاغات والمهام</span></button>';
+    }
+    h+='</div>';
+  } else if(phoneScreen==='garage'){
+    const myCars = (owned.cars && owned.cars.length) ? owned.cars : [];
+    h='<h4>🚘 الكراج ('+myCars.length+')</h4>';
+    if(!myCars.length){
+      h+='<p>لا تملك سيارات حالياً.<br><small style="opacity:.8">اشترِ سيارة من المتجر أو استخدم الأكواد (TOYOTA, BMW, LAMBO, CARS).</small></p>';
+    } else {
+      myCars.forEach(cid=>{
+        const info = allCarsInfo[cid] || {id:cid, name:'🚗 '+cid};
+        h+='<div class="ph-card"><b>'+info.name+'</b><br><button class="ph-act" data-act="spawnCar" data-car="'+cid+'">استدعاء السيارة</button></div>';
+      });
+    }
+  } else if(phoneScreen==='police'){
+    h='<h4>🚓 طلب سيارة شرطة</h4><p>سيتم إرسال أقرب دورية إلى موقعك.</p><button class="ph-act" data-act="send">إرسال دورية</button><p class="ph-msg">'+phMsg+'</p>';
+  } else if(phoneScreen==='reports'){
+    const act=fightPairs.filter(p=>p.state==='fight'||p.state==='flee'), pp=playerPos();
+    h='<h4>📋 البلاغات والمهام</h4>'+(act.length?'':'<p>لا توجد بلاغات حالياً</p>');
+    act.forEach(p=>{
+      const dist=Math.round(Math.hypot(p.pos.x-pp.x,p.pos.z-pp.z));
+      h+='<div class="ph-card"><b>'+(p.state==='flee'?'🏃 مطاردة':'🥊 شجار')+' #'+p.id+'</b><br><small>قرب '+nearLandmark(p.pos.x,p.pos.z)+' — '+dist+' م</small><br>'+(p.accepted?'<span>🎯 المهمة جارية (+500 💰)</span>':'<button class="ph-act" data-act="acc" data-id="'+p.id+'">قبول المهمة</button>')+'</div>';
+    });
+  } else if(phoneScreen==='call'){
+    h='<h4>📞 جهات الاتصال</h4>'+contacts.map((c,i)=>'<button class="ph-act" data-act="call" data-i="'+i+'">'+c.n+' ('+c.num+')</button>').join('');
+  } else if(phoneScreen==='calling'){
+    h='<h4>📞 '+callInfo.name+'</h4><p>'+callInfo.text+'</p>';
+  }
+  phScreen.innerHTML=h;
+}
+function openPhone(v){ phoneOpen=v; phoneEl.style.display=v?'flex':'none'; if(v){ phoneScreen='home'; phMsg=''; renderPhone(); } }
+document.getElementById('phoneBtn').addEventListener('click',()=>openPhone(!phoneOpen));
+document.getElementById('phClose').addEventListener('click',()=>openPhone(false));
+document.getElementById('phHome').addEventListener('click',()=>{ phoneScreen='home'; renderPhone(); });
+addEventListener('keydown',e=>{ if(e.key.toLowerCase()==='p' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) openPhone(!phoneOpen); });
+phScreen.addEventListener('click',e=>{
+  const b=e.target.closest('[data-go],[data-act]'); if(!b) return;
+  if(b.dataset.go){ phoneScreen=b.dataset.go; phMsg=''; renderPhone(); return; }
+  const act=b.dataset.act;
+  if(act==='spawnCar'){
+    const cid=b.dataset.car;
+    summonOwnedCar(cid);
+    const info=allCarsInfo[cid]||{name:'السيارة'};
+    toast('🚘 تم إحضار '+info.name+' أمامك!');
+    openPhone(false);
+  }
+  else if(act==='send'){ if(!isPoliceJob()) return; phMsg=requestPolice()?'✅ الدورية في الطريق، ابقَ في مكانك':'❌ لا توجد دوريات متاحة الآن'; renderPhone(); }
+  else if(act==='acc'){
+    if(!isPoliceJob()) return;
+    const p=fightPairs.find(x=>x.id==b.dataset.id); if(!p) return;
+    p.accepted=true; activeMissionPair=p; toast('🎯 المهمة: توجه للعلامة الحمراء'); renderPhone();
+  } else if(act==='call'){
+    const c=contacts[b.dataset.i]; callInfo={name:c.n+' ('+c.num+')',text:'جاري الاتصال...'}; phoneScreen='calling'; renderPhone();
+    setTimeout(()=>{
+      const ok=c.pol?requestPolice():true;
+      callInfo.text=c.pol?(ok?'✅ تم الرد: الدورية في الطريق إليك':'❌ لا توجد دوريات متاحة'):'✅ تم الرد: تم إرسال الفريق';
+      if(phoneScreen==='calling') renderPhone();
+      setTimeout(()=>{ if(phoneScreen==='calling'){ phoneScreen='call'; renderPhone(); } },2000);
+    },1400);
+  }
+});
+
+let joyId=null;
+joy.addEventListener('touchstart',e=>{
+  e.preventDefault(); e.stopImmediatePropagation();
+  if(joyId!==null) return;
+  const t=e.changedTouches[0]; joyId=t.identifier; joyStart(e); joyMove({touches:[t]});
+},{capture:true,passive:false});
+joy.addEventListener('touchmove',e=>{
+  e.preventDefault(); e.stopImmediatePropagation();
+  for(const t of e.changedTouches) if(t.identifier===joyId) joyMove({touches:[t]});
+},{capture:true,passive:false});
+const joyUp=e=>{ e.stopImmediatePropagation(); for(const t of e.changedTouches) if(t.identifier===joyId){ joyId=null; joyEnd(); } };
+joy.addEventListener('touchend',joyUp,{capture:true}); joy.addEventListener('touchcancel',joyUp,{capture:true});
+const fbtn=document.getElementById('fireBtn');
+fbtn.addEventListener('touchstart',()=>{ fireHeld=true; fireCd=0.2; },{passive:true});
+['touchend','touchcancel','mouseup','mouseleave'].forEach(ev=>fbtn.addEventListener(ev,()=>fireHeld=false));
+fbtn.addEventListener('mousedown',()=>{ fireHeld=true; fireCd=0.2; });
+[['brakeBtn',()=>wantBrake=false],['reverseBtn',()=>wantReverse=false],['flyUpBtn',()=>flyUpPressed=false],['flyDownBtn',()=>flyDownPressed=false]].forEach(([id,fn])=>{
+  document.getElementById(id).addEventListener('touchcancel',fn);
+});
+addEventListener('contextmenu',e=>e.preventDefault());
+document.addEventListener('gesturestart',e=>e.preventDefault());
+
+function initExtras(){
+  const a=spawnPolice(-9,26,0.4); a.parked=true;
+  spawnPolice(-35,24,0); spawnPolice(6,-16,Math.PI);
+  makePair(0); makePair(3); makePair(6);
+  const m=new THREE.Mesh(new THREE.ConeGeometry(0.8,2,8),new THREE.MeshStandardMaterial({color:0xff2d2d,emissive:0xff0000,transparent:true,opacity:0.85}));
+  m.rotation.x=Math.PI; m.visible=false; scene.add(m); missionMarker=m;
+}
+function updateExtras(dt){
+  updatePolice(dt); updatePairs(dt);
+  const ph=Math.floor(performance.now()/140)%2;
+  policeCars.forEach(c=>{
+    const on=c.sirenOn;
+    c.redMat.emissiveIntensity=on?(ph?2.4:0.1):0.08;
+    c.blueMat.emissiveIntensity=on?(ph?0.1:2.4):0.08;
+  });
+  const drivingPolice=!!(inCar&&inCar.isPolice);
+  sirenBtn.style.display=drivingPolice?'block':'none';
+  if(drivingPolice) sirenBtn.textContent=inCar.sirenOn?'🚨 إيقاف السفتي':'🚨 تشغيل السفتي';
+  sirenSound(drivingPolice&&inCar.sirenOn);
+  const mp=activeMissionPair;
+  if(mp&&(mp.state==='fight'||mp.state==='flee')){ missionMarker.visible=true; missionMarker.position.set(mp.pos.x,6+Math.sin(performance.now()/300)*0.4,mp.pos.z); missionMarker.rotation.y+=0.05; }
+  else { missionMarker.visible=false; if(mp&&mp.state!=='arrested') activeMissionPair=null; }
+  fireCd-=dt; if(fireHeld&&fireCd<=0&&!inCar){ shoot(); fireCd=0.18; }
+  phTick+=dt; if(phoneOpen&&phTick>2){ phTick=0; if(phoneScreen==='reports') renderPhone(); }
+}
+
+init();
+initExtras();
+let last = performance.now();
+function animate(now){
+  const dt = Math.min(0.05,(now-last)/1000);
+  last = now;
+  updatePlayer(dt);
+  updateShowCar(dt);
+  updateNPCs(dt);
+  cars.forEach(car => {
+    if(car.isAiCar && car !== inCar){
+      car.aiTimer -= dt;
+      if(car.aiTimer <= 0){
+        car.aiTimer = 3 + Math.random()*5;
+        car.group.rotation.y += (Math.random()-0.5)*1.8;
+      }
+      const cDir = new THREE.Vector3(Math.sin(car.group.rotation.y), 0, Math.cos(car.group.rotation.y));
+      car.group.position.addScaledVector(cDir, car.aiSpeed);
+      if(Math.abs(car.group.position.x) > 280) car.group.rotation.y += Math.PI;
+      if(Math.abs(car.group.position.z) > 280) car.group.rotation.y += Math.PI;
+    }
+  });
+  updateDoors(dt);
+  updateExtras(dt);
+  updateLabels();
+  updateDelivery();
+  if(wantFire){ shoot(); wantFire=false; }
+  updateBullets();
+  updateSmoke();
+  renderer.render(scene, camera);
+  requestAnimationFrame(animate);
+}
+requestAnimationFrame(animate);
+</script>
+</body>
+</html>
